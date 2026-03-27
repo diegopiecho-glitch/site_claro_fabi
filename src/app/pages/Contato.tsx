@@ -224,8 +224,8 @@ export function ContactPage() {
         </div>
       </nav>
 
-      <header className="relative overflow-hidden min-h-[520px] flex items-center px-6 bg-gradient-to-b from-slate-50 to-white">
-        <div className="absolute inset-0 bg-gradient-to-b from-white/75 via-white/70 to-white/90" />
+      <header className="relative overflow-hidden min-h-[480px] md:min-h-[520px] flex items-center px-6 bg-gradient-to-b from-slate-50 to-white">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/25 to-white/50" />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/5 via-transparent to-amber-900/5" />
 
         <div className="relative max-w-7xl mx-auto w-full">
@@ -248,7 +248,7 @@ export function ContactPage() {
                 </span>
               </div>
 
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 text-slate-900 tracking-tight drop-shadow-sm">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 text-slate-900 tracking-tight drop-shadow-sm">
                 {tituloContato}
               </h1>
 

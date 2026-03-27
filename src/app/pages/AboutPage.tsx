@@ -230,7 +230,7 @@ export function AboutPage() {
         </div>
       </nav>
 
-      <header className="relative overflow-hidden min-h-[720px] flex items-center px-6">
+      <header className="relative overflow-hidden min-h-[560px] md:min-h-[720px] flex items-center px-6">
         <div
           className={`absolute inset-0 bg-cover bg-center transition-all duration-[1400ms] ease-out ${
             aboutImageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
@@ -240,7 +240,7 @@ export function AboutPage() {
           }}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-b from-white/72 via-white/58 to-white/84" />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/25 to-white/50" />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/10 via-transparent to-amber-900/10" />
 
         <div className="relative max-w-7xl mx-auto w-full">
@@ -263,11 +263,11 @@ export function AboutPage() {
                 </span>
               </div>
 
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 text-slate-900 tracking-tight drop-shadow-sm">
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 text-slate-900 tracking-tight drop-shadow-sm">
                 {tituloSobre}
               </h1>
 
-              <p className="text-slate-700 max-w-3xl mx-auto text-base md:text-lg leading-relaxed">
+              <p className="text-slate-100 max-w-3xl mx-auto text-base md:text-lg leading-relaxed drop-shadow-md">
                 {subtituloSobre}
               </p>
             </div>

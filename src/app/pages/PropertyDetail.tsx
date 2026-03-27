@@ -159,13 +159,18 @@ export function PropertyDetail() {
       <div className="relative bg-slate-50">
         <div className="max-w-7xl mx-auto">
           {photos.length > 0 ? (
-            <div className="relative h-[500px] overflow-hidden">
+            <div className="relative h-[440px] md:h-[500px] overflow-hidden">
               <img 
                 src={photos[currentPhotoIndex].url || photos[currentPhotoIndex].foto}
                 alt={`Foto ${currentPhotoIndex + 1} do imóvel`}
                 className="w-full h-full object-cover"
               />
-              
+              <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-transparent to-slate-950/35 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-r from-white/30 via-transparent to-white/20 pointer-events-none" />
+              <div className="absolute left-4 bottom-4 bg-slate-950/40 text-slate-100 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm">
+                {currentPhotoIndex + 1}/{photos.length}
+              </div>
+
               {/* Navegação de fotos */}
               {photos.length > 1 && (
                 <>
@@ -216,7 +221,7 @@ export function PropertyDetail() {
             <div>
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h1 className="text-3xl md:text-4xl mb-2 text-slate-900">{property.titulo}</h1>
+                  <h1 className="text-2xl md:text-4xl lg:text-5xl mb-2 text-slate-900 tracking-tight drop-shadow-md">{property.titulo}</h1>
                   <div className="flex items-center gap-2 text-slate-600">
                     <MapPin size={18} />
                     <span>{property.bairro ? `${property.bairro}, ` : ''}{property.cidade}</span>
