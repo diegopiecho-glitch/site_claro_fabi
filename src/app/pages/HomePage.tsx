@@ -374,17 +374,17 @@ export function HomePage() {
             </div>
           </Link>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
   <Link
     to="/sobre"
-    className="inline-flex items-center rounded-full border border-slate-200 bg-white/70 px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700"
+    className="inline-flex justify-center rounded-full border border-slate-200 bg-white/70 px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700"
   >
     Sobre
   </Link>
 
   <Link
     to="/contato"
-    className="inline-flex items-center rounded-full bg-amber-600 text-white px-5 py-2.5 text-sm font-semibold shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-700"
+    className="inline-flex justify-center rounded-full bg-amber-600 text-white px-5 py-2.5 text-sm font-semibold shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-700"
   >
     Contato
   </Link>
