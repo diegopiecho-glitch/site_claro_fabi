@@ -1,4 +1,4 @@
-import { MapPin, Home, Bed, Bath, Car, Ruler } from 'lucide-react';
+import { MapPin, Bed, Bath, Car, Ruler } from 'lucide-react';
 import { Link } from 'react-router';
 
 interface Property {
@@ -37,87 +37,87 @@ export function PropertyCard({ property }: PropertyCardProps) {
     return labels[type as keyof typeof labels];
   };
 
-  const locationText = [property.subtitle, property.city]
-    .filter((value) => Boolean(value && value !== '0'))
-    .join(' - ');
+  const subtitleText = property.subtitle && property.subtitle !== '0' ? property.subtitle : '';
+  const cityText = property.city && property.city !== '0' ? property.city : '';
 
   return (
-    <Link 
+    <Link
       to={`/imovel/${property.id}`}
-      className="bg-white rounded-lg overflow-hidden border border-slate-200 hover:border-amber-600/50 transition-all cursor-pointer group hover:shadow-lg"
+      className="group cursor-pointer overflow-hidden rounded-lg border border-slate-200 bg-white transition-all hover:border-amber-600/50 hover:shadow-lg"
     >
-      {/* Imagem do Imóvel */}
       <div className="relative h-56 overflow-hidden">
-        <img 
-          src={property.image} 
+        <img
+          src={property.image}
           alt={property.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
-        {/* Badge do Tipo */}
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm border border-slate-300 text-slate-900">
+        <div className="absolute right-4 top-4 rounded-full border border-slate-300 bg-white/90 px-3 py-1.5 text-sm text-slate-900 backdrop-blur-sm">
           {getTypeLabel(property.type)}
         </div>
+        {cityText && (
+          <div className="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-full border border-white/40 bg-white/90 px-3 py-1.5 text-sm text-slate-900 shadow-sm backdrop-blur-sm">
+            <MapPin size={14} className="flex-shrink-0 text-amber-600" />
+            <span>{cityText}</span>
+          </div>
+        )}
       </div>
 
-      {/* Conteúdo */}
       <div className="p-5">
-        <h3 className="mb-2 text-slate-900 group-hover:text-amber-600 transition-colors">
+        <h3 className="mb-2 text-slate-900 transition-colors group-hover:text-amber-600">
           {property.title}
         </h3>
-        
-        {locationText && (
-          <div className="flex items-start gap-2 mb-4">
-            <MapPin size={16} className="text-slate-400 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-slate-600 line-clamp-2">{locationText}</p>
+
+        {subtitleText && (
+          <div className="mb-4 flex items-start gap-2">
+            <MapPin size={16} className="mt-0.5 flex-shrink-0 text-slate-400" />
+            <p className="line-clamp-2 text-sm text-slate-600">{subtitleText}</p>
           </div>
         )}
 
-        {/* Características do Imóvel */}
-        {((property.quartos && property.quartos > 0) || 
-          (property.banheiros && property.banheiros > 0) || 
-          (property.garagem && property.garagem > 0) || 
+        {((property.quartos && property.quartos > 0) ||
+          (property.banheiros && property.banheiros > 0) ||
+          (property.garagem && property.garagem > 0) ||
           (property.area && property.area > 0)) && (
           <div className="mb-4">
-            <h4 className="text-sm text-slate-700 mb-3 font-medium">Características</h4>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-4 gap-1.5">
               {property.quartos && property.quartos > 0 && (
-                <div className="flex items-center gap-2 bg-slate-50 rounded-lg p-2.5">
-                  <Bed size={20} className="text-amber-600 flex-shrink-0" />
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-xs text-slate-600">Quartos</span>
-                    <span className="text-sm text-slate-900 font-medium">{property.quartos}</span>
+                <div className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-slate-50 p-2 text-center">
+                  <Bed size={16} className="flex-shrink-0 text-amber-600" />
+                  <div className="min-w-0 leading-tight">
+                    <span className="block text-[11px] text-slate-600">Quartos</span>
+                    <span className="block text-xs font-medium text-slate-900">{property.quartos}</span>
                   </div>
                 </div>
               )}
-              
+
               {property.banheiros && property.banheiros > 0 && (
-                <div className="flex items-center gap-2 bg-slate-50 rounded-lg p-2.5">
-                  <Bath size={20} className="text-amber-600 flex-shrink-0" />
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-xs text-slate-600">Banheiros</span>
-                    <span className="text-sm text-slate-900 font-medium">{property.banheiros}</span>
+                <div className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-slate-50 p-2 text-center">
+                  <Bath size={16} className="flex-shrink-0 text-amber-600" />
+                  <div className="min-w-0 leading-tight">
+                    <span className="block text-[11px] text-slate-600">Banheiros</span>
+                    <span className="block text-xs font-medium text-slate-900">{property.banheiros}</span>
                   </div>
                 </div>
               )}
-              
+
               {property.garagem && property.garagem > 0 && (
-                <div className="flex items-center gap-2 bg-slate-50 rounded-lg p-2.5">
-                  <Car size={20} className="text-amber-600 flex-shrink-0" />
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-xs text-slate-600">Garagem</span>
-                    <span className="text-sm text-slate-900 font-medium">
+                <div className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-slate-50 p-2 text-center">
+                  <Car size={16} className="flex-shrink-0 text-amber-600" />
+                  <div className="min-w-0 leading-tight">
+                    <span className="block text-[11px] text-slate-600">Garagem</span>
+                    <span className="block text-xs font-medium text-slate-900">
                       {property.garagem} {property.garagem === 1 ? 'vaga' : 'vagas'}
                     </span>
                   </div>
                 </div>
               )}
-              
+
               {property.area && property.area > 0 && (
-                <div className="flex items-center gap-2 bg-slate-50 rounded-lg p-2.5">
-                  <Ruler size={20} className="text-amber-600 flex-shrink-0" />
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-xs text-slate-600">Área</span>
-                    <span className="text-sm text-slate-900 font-medium">{property.area}m²</span>
+                <div className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-slate-50 p-2 text-center">
+                  <Ruler size={16} className="flex-shrink-0 text-amber-600" />
+                  <div className="min-w-0 leading-tight">
+                    <span className="block text-[11px] text-slate-600">Área</span>
+                    <span className="block text-xs font-medium text-slate-900">{property.area}m²</span>
                   </div>
                 </div>
               )}
@@ -125,13 +125,13 @@ export function PropertyCard({ property }: PropertyCardProps) {
           </div>
         )}
 
-        <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+        <div className="flex items-center justify-between border-t border-slate-200 pt-4">
           <div>
-            <p className="text-xs text-slate-500 mb-1">Valor</p>
-            <p className="text-amber-600 font-semibold">{formatPrice(property.price)}</p>
+            <p className="mb-1 text-xs text-slate-500">Valor</p>
+            <p className="text-xl font-bold leading-none text-amber-600">{formatPrice(property.price)}</p>
           </div>
-          
-          <span className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+
+          <span className="rounded-lg bg-amber-600 px-4 py-2 text-sm text-white transition-colors hover:bg-amber-700">
             Ver Detalhes
           </span>
         </div>
