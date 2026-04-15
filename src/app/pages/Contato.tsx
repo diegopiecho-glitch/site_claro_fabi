@@ -146,7 +146,7 @@ export function ContactPage() {
 
   const rodape = String(
     config?.descricao_rodape ??
-      '© 2026 Corretora de Imóveis. Todos os direitos reservados.'
+      '© 2026 Corretor de Imóveis. Todos os direitos reservados.'
   );
 
   const instagram = String(config?.link_instagram ?? '#');

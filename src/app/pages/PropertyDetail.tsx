@@ -79,8 +79,11 @@ export function PropertyDetail() {
 
         if (photosResponse.ok) {
           const photosData = await photosResponse.json();
-          const photosList = photosData.items || photosData || [];
+          const photosList = (photosData.items || photosData || []).sort(
+            (a: Photo, b: Photo) => (a.ordem ?? Number.MAX_SAFE_INTEGER) - (b.ordem ?? Number.MAX_SAFE_INTEGER)
+          );
           setPhotos(photosList);
+          setCurrentPhotoIndex(0);
         }
 
       } catch (err) {
@@ -110,8 +113,16 @@ export function PropertyDetail() {
     setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
   };
 
+  const openPhotoInNewTab = (photoUrl: string) => {
+    window.open(`/visualizar-imagem?src=${encodeURIComponent(photoUrl)}`, '_blank', 'noopener,noreferrer');
+  };
+
+  const propertyUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/imovel/${id}`
+    : '';
+
   const whatsappMessage = property 
-    ? `Olá! Tenho interesse no imóvel: ${property.titulo} - ${formatPrice(property.preco)}`
+    ? `Olá! Tenho interesse no imóvel: ${property.titulo} - ${formatPrice(property.preco)}\n${propertyUrl}`
     : '';
 
   if (loading) {
@@ -174,11 +185,18 @@ export function PropertyDetail() {
         <div className="max-w-7xl mx-auto">
           {photos.length > 0 ? (
             <div className="relative h-[440px] md:h-[500px] overflow-hidden">
-              <img 
-                src={photos[currentPhotoIndex].url || photos[currentPhotoIndex].foto}
-                alt={`Foto ${currentPhotoIndex + 1} do imóvel`}
-                className="w-full h-full object-cover"
-              />
+              <button
+                type="button"
+                onClick={() => openPhotoInNewTab(photos[currentPhotoIndex].url || photos[currentPhotoIndex].foto)}
+                className="block h-full w-full"
+                aria-label={`Abrir foto ${currentPhotoIndex + 1} em uma nova aba`}
+              >
+                <img 
+                  src={photos[currentPhotoIndex].url || photos[currentPhotoIndex].foto}
+                  alt={`Foto ${currentPhotoIndex + 1} do imóvel`}
+                  className="w-full h-full object-cover cursor-zoom-in"
+                />
+              </button>
               <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-transparent to-slate-950/35 pointer-events-none" />
               <div className="absolute inset-0 bg-gradient-to-r from-white/30 via-transparent to-white/20 pointer-events-none" />
               <div className="absolute left-4 bottom-4 bg-slate-950/40 text-slate-100 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm">

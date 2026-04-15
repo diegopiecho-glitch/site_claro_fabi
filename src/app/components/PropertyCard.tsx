@@ -37,6 +37,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
     return labels[type as keyof typeof labels];
   };
 
+  const locationText = [property.subtitle, property.city]
+    .filter((value) => Boolean(value && value !== '0'))
+    .join(' - ');
+
   return (
     <Link 
       to={`/imovel/${property.id}`}
@@ -61,10 +65,10 @@ export function PropertyCard({ property }: PropertyCardProps) {
           {property.title}
         </h3>
         
-        {property.subtitle && property.subtitle !== '0' && (
+        {locationText && (
           <div className="flex items-start gap-2 mb-4">
             <MapPin size={16} className="text-slate-400 mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-slate-600 line-clamp-2">{property.subtitle}</p>
+            <p className="text-sm text-slate-600 line-clamp-2">{locationText}</p>
           </div>
         )}
 
