@@ -17,6 +17,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { SocialButton } from '../components/SocialButton';
+import { Seo } from '../components/Seo';
 
 interface PropertyDetails {
   id_imovel: number;
@@ -120,6 +121,22 @@ export function PropertyDetail() {
   const propertyUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/imovel/${id}`
     : '';
+  const seoTitle = property
+    ? `${property.titulo} | ${property.cidade || 'Imóvel'}`
+    : 'Detalhes do imóvel';
+  const seoDescription = property
+    ? [
+        property.tipo,
+        property.bairro,
+        property.cidade,
+        formatPrice(property.preco),
+        property.descricao
+      ]
+        .filter(Boolean)
+        .join(' - ')
+        .slice(0, 320)
+    : 'Detalhes completos do imóvel.';
+  const seoImage = photos[0]?.url || photos[0]?.foto;
 
   const whatsappMessage = property 
     ? `Olá! Tenho interesse no imóvel: ${property.titulo} - ${formatPrice(property.preco)}\n${propertyUrl}`
@@ -153,6 +170,12 @@ export function PropertyDetail() {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
+      <Seo
+        title={seoTitle}
+        description={seoDescription}
+        url={propertyUrl || undefined}
+        image={seoImage}
+      />
       {/* Header com botão voltar */}
       <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">

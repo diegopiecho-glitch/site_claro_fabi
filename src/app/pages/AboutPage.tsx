@@ -11,6 +11,7 @@ import {
   Home
 } from 'lucide-react';
 import { SocialButton } from '../components/SocialButton';
+import { Seo } from '../components/Seo';
 
 interface SiteConfig {
   titulo_home_site?: string | number;
@@ -173,9 +174,23 @@ export function AboutPage() {
   const whatsapp = whatsappNumero ? `https://wa.me/${whatsappNumero}` : '#';
 
   const logoUrl = String(config?.url_logotipo ?? config?.URL_LOGOTIPO ?? '');
+  const baseUrl = window.location.origin;
+  const seoUrl = `${baseUrl}/sobre`;
+  const seoTitle = `${tituloSobre} | ${nomecorretor}`;
+  const seoDescription = [subtituloSobre, descricaoSobre]
+    .filter(Boolean)
+    .join(' - ')
+    .slice(0, 320);
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
+      <Seo
+        nomecorretor={nomecorretor}
+        title={seoTitle}
+        description={seoDescription}
+        url={seoUrl}
+        image={aboutImage}
+      />
       <nav className="sticky top-0 z-50 border-b border-white/30 bg-white/80 backdrop-blur-xl shadow-[0_8px_30px_rgba(15,23,42,0.06)]">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link
