@@ -5,6 +5,7 @@ import { PropertyDetail } from "./pages/PropertyDetail";
 import { AboutPage } from "./pages/AboutPage";
 import { ContactPage } from "./pages/Contato";
 import { ImageViewer } from "./pages/ImageViewer";
+import { SystemRedirect } from "./pages/SystemRedirect";
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ export const router = createBrowserRouter([
       {
         path: "/visualizar-imagem",
         Component: ImageViewer,
+      },
+      {
+        path: "/sistema",
+        Component: SystemRedirect,
       },
     ],
   },

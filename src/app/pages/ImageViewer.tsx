@@ -2,7 +2,17 @@ import { useSearchParams } from 'react-router';
 
 export function ImageViewer() {
   const [searchParams] = useSearchParams();
-  const imageUrl = searchParams.get('src');
+  const imageKey = searchParams.get('image');
+  const legacyImageUrl = searchParams.get('src');
+  let imageUrl = legacyImageUrl;
+
+  if (!imageUrl && imageKey && typeof window !== 'undefined') {
+    imageUrl = window.localStorage.getItem(imageKey);
+
+    if (imageUrl) {
+      window.localStorage.removeItem(imageKey);
+    }
+  }
 
   if (!imageUrl) {
     return (

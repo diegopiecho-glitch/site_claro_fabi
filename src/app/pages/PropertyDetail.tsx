@@ -43,6 +43,91 @@ interface Photo {
   [key: string]: any;
 }
 
+const getPhotoOrder = (photo: Photo) => {
+  const rawOrder =
+    photo.ordem ??
+    photo.ORDEM ??
+    photo.ordem_foto ??
+    photo.ORDEM_FOTO ??
+    photo.sequencia ??
+    photo.SEQUENCIA;
+
+  if (rawOrder === null || rawOrder === undefined || rawOrder === '') {
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  const parsedOrder = Number(rawOrder);
+  return Number.isFinite(parsedOrder) ? parsedOrder : Number.MAX_SAFE_INTEGER;
+};
+
+const getPhotoId = (photo: Photo) => {
+  const rawId = photo.id ?? photo.ID ?? photo.id_foto ?? photo.ID_FOTO;
+  const parsedId = Number(rawId);
+  return Number.isFinite(parsedId) ? parsedId : Number.MAX_SAFE_INTEGER;
+};
+
+const getPhotoUrl = (photo: Photo) =>
+  photo.url ?? photo.URL ?? photo.foto ?? photo.FOTO ?? '';
+
+const getPhotoOrderFromUrl = (photo: Photo) => {
+  const photoUrl = getPhotoUrl(photo);
+
+  if (!photoUrl) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  const filename = photoUrl.split('/').pop() ?? '';
+
+  const explicitSuffixMatch = filename.match(/[_-]{1,2}(\d+)(?=[_.-][^.]+$)/);
+  if (explicitSuffixMatch) {
+    return Number(explicitSuffixMatch[1]);
+  }
+
+  const numericChunks = [...filename.matchAll(/(\d+)/g)]
+    .map((match) => Number(match[1]))
+    .filter((value) => Number.isFinite(value) && value < 1000);
+
+  return numericChunks.length > 0
+    ? numericChunks[numericChunks.length - 1]
+    : Number.MAX_SAFE_INTEGER;
+};
+
+const normalizePhotos = (photosData: unknown, propertyId?: number): Photo[] => {
+  const items = Array.isArray(photosData)
+    ? photosData
+    : Array.isArray((photosData as { items?: unknown[] })?.items)
+      ? (photosData as { items: unknown[] }).items
+      : [];
+
+  return items
+    .filter((item): item is Photo => Boolean(item && typeof item === 'object'))
+    .map((photo, index) => ({
+      ...photo,
+      id: getPhotoId(photo),
+      id_imovel: Number(photo.id_imovel ?? photo.ID_IMOVEL ?? 0),
+      url: getPhotoUrl(photo),
+      ordem:
+        getPhotoOrder(photo) === Number.MAX_SAFE_INTEGER
+          ? getPhotoOrderFromUrl(photo)
+          : getPhotoOrder(photo),
+      _originalIndex: index,
+    }))
+    .filter((photo) =>
+      propertyId === undefined ? true : photo.id_imovel === propertyId
+    )
+    .filter((photo) => Boolean(photo.url))
+    .sort((a, b) => {
+      const orderDiff = (a.ordem ?? Number.MAX_SAFE_INTEGER) - (b.ordem ?? Number.MAX_SAFE_INTEGER);
+      if (orderDiff !== 0) return orderDiff;
+
+      const idDiff = (a.id ?? Number.MAX_SAFE_INTEGER) - (b.id ?? Number.MAX_SAFE_INTEGER);
+      if (idDiff !== 0) return idDiff;
+
+      return (a._originalIndex ?? 0) - (b._originalIndex ?? 0);
+    })
+    .map(({ _originalIndex, ...photo }) => photo);
+};
+
 export function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
   const [property, setProperty] = useState<PropertyDetails | null>(null);
@@ -61,7 +146,8 @@ export function PropertyDetail() {
 
         // Buscar detalhes do imóvel
         const detailsResponse = await fetch(
-          `https://gfeee0b664f71e7-dbimoveis.adb.sa-saopaulo-1.oraclecloudapps.com/ords/imoveis/imoveis/detalhe/${id}`
+          `https://gfeee0b664f71e7-dbimoveis.adb.sa-saopaulo-1.oraclecloudapps.com/ords/imoveis/imoveis/detalhe/${id}`,
+          { cache: 'no-store' }
         );
 
         if (!detailsResponse.ok) {
@@ -75,14 +161,13 @@ export function PropertyDetail() {
 
         // Buscar fotos do imóvel
         const photosResponse = await fetch(
-          `https://gfeee0b664f71e7-dbimoveis.adb.sa-saopaulo-1.oraclecloudapps.com/ords/imoveis/imoveis/fotos/${id}`
+          'https://gfeee0b664f71e7-dbimoveis.adb.sa-saopaulo-1.oraclecloudapps.com/ords/imoveis/fotodetalheimovel/',
+          { cache: 'no-store' }
         );
 
         if (photosResponse.ok) {
           const photosData = await photosResponse.json();
-          const photosList = (photosData.items || photosData || []).sort(
-            (a: Photo, b: Photo) => (a.ordem ?? Number.MAX_SAFE_INTEGER) - (b.ordem ?? Number.MAX_SAFE_INTEGER)
-          );
+          const photosList = normalizePhotos(photosData, Number(id));
           setPhotos(photosList);
           setCurrentPhotoIndex(0);
         }
@@ -115,7 +200,14 @@ export function PropertyDetail() {
   };
 
   const openPhotoInNewTab = (photoUrl: string) => {
-    window.open(`/visualizar-imagem?src=${encodeURIComponent(photoUrl)}`, '_blank', 'noopener,noreferrer');
+    const imageKey = `property-image-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    try {
+      window.localStorage.setItem(imageKey, photoUrl);
+      window.open(`/visualizar-imagem?image=${encodeURIComponent(imageKey)}`, '_blank', 'noopener,noreferrer');
+    } catch {
+      window.open(`/visualizar-imagem?src=${encodeURIComponent(photoUrl)}`, '_blank', 'noopener,noreferrer');
+    }
   };
 
   const propertyUrl = typeof window !== 'undefined'
