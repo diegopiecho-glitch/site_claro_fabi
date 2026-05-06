@@ -1,33 +1,74 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, Outlet } from 'react-router'
-import { Home, Building2, Settings, LogOut, ChevronRight } from 'lucide-react'
-import { isAuthenticated, logout } from '../../lib/auth'
+import { Home, Building2, Settings, LogOut, ChevronRight, Loader2, Menu, X } from 'lucide-react'
+import { isAuthenticated, logout, validateSession } from '../../lib/auth'
 
 const NAV = [
-  { path: '/sistema/home',          label: 'Dashboard',           Icon: Home      },
-  { path: '/sistema/imoveis',       label: 'Imóveis',             Icon: Building2 },
+  { path: '/sistema/home',          label: 'Dashboard',             Icon: Home      },
+  { path: '/sistema/imoveis',       label: 'Imóveis',               Icon: Building2 },
   { path: '/sistema/configuracoes', label: 'Configurações do Site', Icon: Settings  },
 ]
 
 export function SistemaLayout() {
   const location = useLocation()
   const navigate = useNavigate()
+  const [checkingAuth, setCheckingAuth] = useState(true)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    if (!isAuthenticated()) navigate('/sistema', { replace: true })
+    let ativo = true
+
+    ;(async () => {
+      if (!isAuthenticated()) {
+        navigate('/sistema', { replace: true })
+        return
+      }
+
+      const valid = await validateSession()
+      if (!ativo) return
+
+      if (!valid) {
+        navigate('/sistema', { replace: true })
+        return
+      }
+
+      setCheckingAuth(false)
+    })()
+
+    return () => {
+      ativo = false
+    }
   }, [navigate])
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     navigate('/sistema')
+  }
+
+  const handleNavigate = () => {
+    setMobileMenuOpen(false)
+  }
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="animate-spin text-amber-600" size={36} />
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
+      {mobileMenuOpen && (
+        <button
+          type="button"
+          className="fixed inset-0 z-30 bg-slate-950/55 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-label="Fechar menu"
+        />
+      )}
 
-      {/* Sidebar */}
-      <aside className="w-60 bg-slate-900 text-white flex flex-col fixed h-full z-20 shadow-2xl">
-
+      <aside className={`fixed z-40 flex h-full w-72 flex-col bg-slate-900 text-white shadow-2xl transition-transform duration-300 md:z-20 md:w-60 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="p-5 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-600 shadow-md shrink-0">
@@ -37,6 +78,14 @@ export function SistemaLayout() {
               <p className="font-semibold text-sm truncate">Gerenciamento</p>
               <p className="text-xs text-slate-400 truncate">Sistema Imobiliário</p>
             </div>
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(false)}
+              className="ml-auto inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-700 text-slate-300 transition-colors hover:bg-slate-800 hover:text-white md:hidden"
+              aria-label="Fechar menu"
+            >
+              <X size={18} />
+            </button>
           </div>
         </div>
 
@@ -50,6 +99,7 @@ export function SistemaLayout() {
               <Link
                 key={path}
                 to={path}
+                onClick={handleNavigate}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                   active
                     ? 'bg-amber-600 text-white font-medium'
@@ -84,8 +134,23 @@ export function SistemaLayout() {
         </div>
       </aside>
 
-      {/* Conteúdo */}
-      <main className="flex-1 ml-60 min-h-screen overflow-y-auto">
+      <main className="flex-1 min-h-screen overflow-y-auto md:ml-60">
+        <div className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur md:hidden">
+          <div className="flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(true)}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm transition-colors hover:border-amber-200 hover:text-amber-700"
+              aria-label="Abrir menu"
+            >
+              <Menu size={20} />
+            </button>
+            <div className="min-w-0 text-right">
+              <p className="truncate text-sm font-semibold text-slate-900">Sistema ImobiliÃ¡rio</p>
+              <p className="truncate text-xs text-slate-500">Painel administrativo</p>
+            </div>
+          </div>
+        </div>
         <Outlet />
       </main>
     </div>

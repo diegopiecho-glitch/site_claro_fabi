@@ -17,9 +17,15 @@ interface Property {
 
 interface PropertyCardProps {
   property: Property;
+  to?: string;
+  actionLabel?: string;
 }
 
-export function PropertyCard({ property }: PropertyCardProps) {
+export function PropertyCard({
+  property,
+  to,
+  actionLabel = 'Ver Detalhes'
+}: PropertyCardProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -39,10 +45,11 @@ export function PropertyCard({ property }: PropertyCardProps) {
 
   const subtitleText = property.subtitle && property.subtitle !== '0' ? property.subtitle : '';
   const cityText = property.city && property.city !== '0' ? property.city : '';
+  const destination = to ?? `/imovel/${property.id}`;
 
   return (
     <Link
-      to={`/imovel/${property.id}`}
+      to={destination}
       className="group cursor-pointer overflow-hidden rounded-lg border border-slate-200 bg-white transition-all hover:border-amber-600/50 hover:shadow-lg"
     >
       <div className="relative h-56 overflow-hidden">
@@ -79,7 +86,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
           (property.garagem && property.garagem > 0) ||
           (property.area && property.area > 0)) && (
           <div className="mb-4">
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
               {property.quartos && property.quartos > 0 && (
                 <div className="flex min-w-0 flex-col items-center justify-center gap-1 rounded-lg bg-slate-50 p-2 text-center">
                   <Bed size={16} className="flex-shrink-0 text-amber-600" />
@@ -125,14 +132,14 @@ export function PropertyCard({ property }: PropertyCardProps) {
           </div>
         )}
 
-        <div className="flex items-center justify-between border-t border-slate-200 pt-4">
-          <div>
+        <div className="flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <p className="mb-1 text-xs text-slate-500">Valor</p>
             <p className="text-xl font-bold leading-none text-amber-600">{formatPrice(property.price)}</p>
           </div>
 
-          <span className="rounded-lg bg-amber-600 px-4 py-2 text-sm text-white transition-colors hover:bg-amber-700">
-            Ver Detalhes
+          <span className="inline-flex justify-center rounded-lg bg-amber-600 px-4 py-2 text-sm text-white transition-colors hover:bg-amber-700">
+            {actionLabel}
           </span>
         </div>
       </div>

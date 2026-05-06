@@ -306,7 +306,7 @@ export function PropertyDetail() {
       <div className="relative bg-slate-50">
         <div className="max-w-7xl mx-auto">
           {photos.length > 0 ? (
-            <div className="relative h-[440px] md:h-[500px] overflow-hidden">
+            <div className="relative h-[280px] sm:h-[360px] md:h-[500px] overflow-hidden">
               <button
                 type="button"
                 onClick={() => openPhotoInNewTab(photos[currentPhotoIndex].url || photos[currentPhotoIndex].foto)}
@@ -330,13 +330,13 @@ export function PropertyDetail() {
                 <>
                   <button
                     onClick={prevPhoto}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white/95 backdrop-blur-sm p-3 rounded-full transition-colors border border-slate-300"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full border border-slate-300 bg-white/90 p-2 backdrop-blur-sm transition-colors hover:bg-white/95 sm:left-4 sm:p-3"
                   >
                     <ChevronLeft size={24} className="text-slate-900" />
                   </button>
                   <button
                     onClick={nextPhoto}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white/95 backdrop-blur-sm p-3 rounded-full transition-colors border border-slate-300"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-slate-300 bg-white/90 p-2 backdrop-blur-sm transition-colors hover:bg-white/95 sm:right-4 sm:p-3"
                   >
                     <ChevronRight size={24} className="text-slate-900" />
                   </button>
@@ -359,7 +359,7 @@ export function PropertyDetail() {
               )}
             </div>
           ) : (
-            <div className="h-[500px] bg-slate-200 flex items-center justify-center">
+            <div className="h-[280px] sm:h-[360px] md:h-[500px] bg-slate-200 flex items-center justify-center">
               <Home className="text-slate-400" size={64} />
             </div>
           )}
@@ -367,13 +367,13 @@ export function PropertyDetail() {
       </div>
 
       {/* Conteúdo Principal */}
-      <main className="max-w-7xl mx-auto px-6 py-12 bg-white">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 md:py-12 bg-white">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Informações do Imóvel */}
           <div className="lg:col-span-2 space-y-6">
             {/* Título e Preço */}
             <div>
-              <div className="flex items-start justify-between mb-4">
+              <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <div>
                   <h1 className="text-2xl md:text-4xl lg:text-5xl mb-2 text-slate-900 tracking-tight drop-shadow-md">{property.titulo}</h1>
                   <div className="flex items-center gap-2 text-slate-600">
@@ -381,9 +381,9 @@ export function PropertyDetail() {
                     <span>{property.bairro ? `${property.bairro}, ` : ''}{property.cidade}</span>
                   </div>
                 </div>
-                <div className="bg-amber-600 px-4 py-2 rounded-lg">
+                <div className="w-full rounded-lg bg-amber-600 px-4 py-3 md:w-auto">
                   <span className="text-sm text-amber-100">Investimento</span>
-                  <p className="text-2xl font-bold text-white">{formatPrice(property.preco)}</p>
+                  <p className="text-xl font-bold text-white sm:text-2xl">{formatPrice(property.preco)}</p>
                 </div>
               </div>
 
@@ -395,9 +395,9 @@ export function PropertyDetail() {
             {/* Características */}
             <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
               <h2 className="text-xl mb-4 text-slate-900">Características</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                 {property.quartos && (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 rounded-xl bg-white p-3">
                     <div className="bg-slate-100 p-3 rounded-lg">
                       <Bed className="text-amber-600" size={24} />
                     </div>
@@ -409,7 +409,7 @@ export function PropertyDetail() {
                 )}
                 
                 {property.banheiros && (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 rounded-xl bg-white p-3">
                     <div className="bg-slate-100 p-3 rounded-lg">
                       <Bath className="text-amber-600" size={24} />
                     </div>
@@ -421,7 +421,7 @@ export function PropertyDetail() {
                 )}
                 
                 {property.garagem && (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 rounded-xl bg-white p-3">
                     <div className="bg-slate-100 p-3 rounded-lg">
                       <Car className="text-amber-600" size={24} />
                     </div>
@@ -433,7 +433,7 @@ export function PropertyDetail() {
                 )}
                 
                 {property.area && (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 rounded-xl bg-white p-3">
                     <div className="bg-slate-100 p-3 rounded-lg">
                       <Ruler className="text-amber-600" size={24} />
                     </div>

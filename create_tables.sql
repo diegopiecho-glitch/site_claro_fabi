@@ -171,3 +171,244 @@ ORDER BY
     i.dt_criacao DESC;
 
 COMMENT ON TABLE imoveis.cardhomesite IS 'View usada pelo endpoint ORDS /cardhomesite/. Retorna imoveis ativos para os cards da home.';
+
+
+-- =============================================================
+-- TABELA: USUARIOS_SISTEMA
+-- Usuarios administrativos do sistema
+-- =============================================================
+CREATE TABLE imoveis.usuarios_sistema (
+    id_usuario      NUMBER          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario         VARCHAR2(100)   NOT NULL,
+    nome            VARCHAR2(200),
+    senha_salt      VARCHAR2(64)    NOT NULL,
+    senha_hash      VARCHAR2(64)    NOT NULL,
+    ativo           NUMBER(1)       DEFAULT 1 NOT NULL,
+    dt_criacao      TIMESTAMP       DEFAULT SYSTIMESTAMP,
+    dt_atualizacao  TIMESTAMP       DEFAULT SYSTIMESTAMP,
+
+    CONSTRAINT uk_usuarios_sistema_usuario UNIQUE (usuario)
+);
+
+COMMENT ON TABLE imoveis.usuarios_sistema IS 'Usuarios que podem acessar o sistema administrativo.';
+COMMENT ON COLUMN imoveis.usuarios_sistema.senha_salt IS 'Salt unico por usuario para composicao do hash da senha.';
+COMMENT ON COLUMN imoveis.usuarios_sistema.senha_hash IS 'Hash SHA-256 da senha com salt.';
+COMMENT ON COLUMN imoveis.usuarios_sistema.ativo IS '1 = usuario ativo, 0 = bloqueado.';
+
+
+-- =============================================================
+-- TABELA: SESSOES_SISTEMA
+-- Tokens de sessao do painel administrativo
+-- =============================================================
+CREATE TABLE imoveis.sessoes_sistema (
+    id_sessao         NUMBER          GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_usuario        NUMBER          NOT NULL,
+    token             VARCHAR2(128)   NOT NULL,
+    ativo             NUMBER(1)       DEFAULT 1 NOT NULL,
+    dt_criacao        TIMESTAMP       DEFAULT SYSTIMESTAMP,
+    dt_ultimo_acesso  TIMESTAMP       DEFAULT SYSTIMESTAMP,
+    dt_expiracao      TIMESTAMP       NOT NULL,
+
+    CONSTRAINT fk_sessoes_usuario
+        FOREIGN KEY (id_usuario)
+        REFERENCES imoveis.usuarios_sistema (id_usuario)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uk_sessoes_sistema_token UNIQUE (token)
+);
+
+COMMENT ON TABLE imoveis.sessoes_sistema IS 'Sessoes autenticadas do sistema administrativo.';
+COMMENT ON COLUMN imoveis.sessoes_sistema.token IS 'Token aleatorio de sessao usado pelo frontend nas operacoes administrativas.';
+COMMENT ON COLUMN imoveis.sessoes_sistema.dt_expiracao IS 'Horario limite de validade da sessao.';
+
+CREATE INDEX idx_usuarios_sistema_usuario ON imoveis.usuarios_sistema (usuario);
+CREATE INDEX idx_sessoes_sistema_token ON imoveis.sessoes_sistema (token);
+CREATE INDEX idx_sessoes_sistema_usuario ON imoveis.sessoes_sistema (id_usuario, ativo, dt_expiracao);
+
+
+-- =============================================================
+-- PACOTE: PKG_AUTH_SISTEMA
+-- Regras de autenticacao, hash de senha e sessao
+-- =============================================================
+CREATE OR REPLACE PACKAGE pkg_auth_sistema AS
+    c_duracao_sessao_min CONSTANT PLS_INTEGER := 480;
+
+    FUNCTION gerar_salt RETURN VARCHAR2;
+    FUNCTION hash_senha(p_salt VARCHAR2, p_senha VARCHAR2) RETURN VARCHAR2;
+    PROCEDURE criar_usuario(
+        p_usuario IN VARCHAR2,
+        p_senha   IN VARCHAR2,
+        p_nome    IN VARCHAR2 DEFAULT NULL
+    );
+    FUNCTION autenticar(
+        p_usuario IN VARCHAR2,
+        p_senha   IN VARCHAR2
+    ) RETURN NUMBER;
+    FUNCTION criar_sessao(
+        p_id_usuario IN NUMBER,
+        p_duracao_minutos IN PLS_INTEGER DEFAULT c_duracao_sessao_min
+    ) RETURN VARCHAR2;
+    FUNCTION validar_sessao(
+        p_token IN VARCHAR2,
+        p_renovar_minutos IN PLS_INTEGER DEFAULT c_duracao_sessao_min
+    ) RETURN NUMBER;
+    PROCEDURE encerrar_sessao(p_token IN VARCHAR2);
+END pkg_auth_sistema;
+/
+
+CREATE OR REPLACE PACKAGE BODY pkg_auth_sistema AS
+    FUNCTION gerar_salt RETURN VARCHAR2 IS
+    BEGIN
+        RETURN RAWTOHEX(SYS_GUID()) || RAWTOHEX(SYS_GUID());
+    END gerar_salt;
+
+    FUNCTION hash_senha(p_salt VARCHAR2, p_senha VARCHAR2) RETURN VARCHAR2 IS
+        v_hash VARCHAR2(64);
+    BEGIN
+        SELECT STANDARD_HASH(NVL(p_salt, '') || NVL(p_senha, ''), 'SHA256')
+          INTO v_hash
+          FROM dual;
+
+        RETURN v_hash;
+    END hash_senha;
+
+    PROCEDURE criar_usuario(
+        p_usuario IN VARCHAR2,
+        p_senha   IN VARCHAR2,
+        p_nome    IN VARCHAR2 DEFAULT NULL
+    ) IS
+        v_salt VARCHAR2(64);
+    BEGIN
+        v_salt := gerar_salt();
+
+        INSERT INTO usuarios_sistema (
+            usuario,
+            nome,
+            senha_salt,
+            senha_hash,
+            ativo
+        ) VALUES (
+            LOWER(TRIM(p_usuario)),
+            p_nome,
+            v_salt,
+            hash_senha(v_salt, p_senha),
+            1
+        );
+    END criar_usuario;
+
+    FUNCTION autenticar(
+        p_usuario IN VARCHAR2,
+        p_senha   IN VARCHAR2
+    ) RETURN NUMBER IS
+        v_id_usuario usuarios_sistema.id_usuario%TYPE;
+    BEGIN
+        SELECT u.id_usuario
+          INTO v_id_usuario
+          FROM usuarios_sistema u
+         WHERE u.usuario = LOWER(TRIM(p_usuario))
+           AND u.ativo = 1
+           AND u.senha_hash = hash_senha(u.senha_salt, p_senha);
+
+        RETURN v_id_usuario;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RETURN NULL;
+    END autenticar;
+
+    FUNCTION criar_sessao(
+        p_id_usuario IN NUMBER,
+        p_duracao_minutos IN PLS_INTEGER DEFAULT c_duracao_sessao_min
+    ) RETURN VARCHAR2 IS
+        v_token VARCHAR2(128);
+    BEGIN
+        v_token := LOWER(RAWTOHEX(SYS_GUID()) || RAWTOHEX(SYS_GUID()));
+
+        INSERT INTO sessoes_sistema (
+            id_usuario,
+            token,
+            ativo,
+            dt_expiracao
+        ) VALUES (
+            p_id_usuario,
+            v_token,
+            1,
+            SYSTIMESTAMP + NUMTODSINTERVAL(p_duracao_minutos, 'MINUTE')
+        );
+
+        RETURN v_token;
+    END criar_sessao;
+
+    FUNCTION validar_sessao(
+        p_token IN VARCHAR2,
+        p_renovar_minutos IN PLS_INTEGER DEFAULT c_duracao_sessao_min
+    ) RETURN NUMBER IS
+        v_id_usuario sessoes_sistema.id_usuario%TYPE;
+    BEGIN
+        IF TRIM(p_token) IS NULL THEN
+            RETURN NULL;
+        END IF;
+
+        SELECT s.id_usuario
+          INTO v_id_usuario
+          FROM sessoes_sistema s
+          JOIN usuarios_sistema u
+            ON u.id_usuario = s.id_usuario
+         WHERE s.token = TRIM(p_token)
+           AND s.ativo = 1
+           AND s.dt_expiracao > SYSTIMESTAMP
+           AND u.ativo = 1;
+
+        UPDATE sessoes_sistema
+           SET dt_ultimo_acesso = SYSTIMESTAMP,
+               dt_expiracao = SYSTIMESTAMP + NUMTODSINTERVAL(p_renovar_minutos, 'MINUTE')
+         WHERE token = TRIM(p_token);
+
+        RETURN v_id_usuario;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RETURN NULL;
+    END validar_sessao;
+
+    PROCEDURE encerrar_sessao(p_token IN VARCHAR2) IS
+    BEGIN
+        UPDATE sessoes_sistema
+           SET ativo = 0,
+               dt_expiracao = SYSTIMESTAMP
+         WHERE token = TRIM(p_token);
+    END encerrar_sessao;
+END pkg_auth_sistema;
+/
+
+
+-- =============================================================
+-- USUARIO INICIAL DO SISTEMA
+-- Altere a senha logo apos publicar em producao
+-- =============================================================
+BEGIN
+    BEGIN
+        pkg_auth_sistema.criar_usuario(
+            p_usuario => 'admin',
+            p_senha   => '35952!', -- CRECI
+            p_nome    => 'Administrador'
+        );
+    EXCEPTION
+        WHEN DUP_VAL_ON_INDEX THEN
+            NULL;
+    END;
+    COMMIT;
+END;
+/
+BEGIN
+    BEGIN
+        pkg_auth_sistema.criar_usuario(
+            p_usuario => 'fabi',
+            p_senha   => '35952!@#', -- CRECI
+            p_nome    => 'Fabiane Niewierowska'
+        );
+    EXCEPTION
+        WHEN DUP_VAL_ON_INDEX THEN
+            NULL;
+    END;
+    COMMIT;
+END;
+/

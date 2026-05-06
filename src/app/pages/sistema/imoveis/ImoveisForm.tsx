@@ -26,7 +26,6 @@ interface FormData {
   banheiros: string
   garagem:   string
   area:      string
-  imagem:    string
   ativo:     string
 }
 
@@ -78,7 +77,7 @@ function reindexarFotos(lista: Foto[]): Foto[] {
 const VAZIO: FormData = {
   titulo: '', subtitulo: '', descricao: '', tipo: '', cidade: '',
   bairro: '', endereco: '', preco: '', quartos: '', banheiros: '',
-  garagem: '', area: '', imagem: '', ativo: '1',
+  garagem: '', area: '', ativo: '1',
 }
 
 function Campo({ label, obrigatorio, children }: {
@@ -132,7 +131,6 @@ export function ImoveisForm() {
           banheiros: String(imovel.banheiros ?? ''),
           garagem:   String(imovel.garagem   ?? ''),
           area:      String(imovel.area      ?? ''),
-          imagem:    imovel.imagem    ?? '',
           ativo:     String(imovel.ativo ?? 1),
         })
 
@@ -181,7 +179,6 @@ export function ImoveisForm() {
       banheiros: form.banheiros  ? parseInt(form.banheiros)   : null,
       garagem:   form.garagem    ? parseInt(form.garagem)     : null,
       area:      form.area       ? parseFloat(form.area)      : null,
-      imagem:    form.imagem     || null,
       ativo:     parseInt(form.ativo),
     }
 
@@ -457,30 +454,18 @@ export function ImoveisForm() {
           </div>
         </section>
 
-        {/* Descrição e imagem de capa */}
+        {/* Descrição */}
         <section className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-          <h2 className="font-semibold text-slate-900 mb-5">Descrição e Imagem de Capa</h2>
-          <div className="space-y-4">
-            <Campo label="Descrição completa">
-              <Textarea
-                value={form.descricao}
-                onChange={set('descricao')}
-                rows={5}
-                placeholder="Descreva os detalhes, diferenciais e condições do imóvel..."
-                className="resize-none"
-              />
-            </Campo>
-            <Campo label="URL da imagem de capa (exibida nos cards da home)">
-              <Input value={form.imagem} onChange={set('imagem')} placeholder="https://..." />
-              {form.imagem && (
-                <img
-                  src={form.imagem}
-                  alt="Pré-visualização da capa"
-                  className="mt-2 h-36 w-auto rounded-xl object-cover border border-slate-200 shadow-sm"
-                />
-              )}
-            </Campo>
-          </div>
+          <h2 className="font-semibold text-slate-900 mb-5">Descrição</h2>
+          <Campo label="Descrição completa">
+            <Textarea
+              value={form.descricao}
+              onChange={set('descricao')}
+              rows={8}
+              placeholder="Descreva os detalhes, diferenciais e condições do imóvel..."
+              className="min-h-[220px] resize-y"
+            />
+          </Campo>
         </section>
 
         {/* Mensagem de erro */}

@@ -8,7 +8,9 @@ import {
   Home,
   Building2,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Menu,
+  X
 } from 'lucide-react';
 import { Link } from 'react-router';
 import { PropertyCard } from '../components/PropertyCard';
@@ -36,15 +38,25 @@ interface SiteConfig {
   url_logotipo?: string;
   URL_LOGOTIPO?: string;
   titulo_home_site?: string | number;
+  TITULO_HOME_SITE?: string | number;
   subtitulo_home_site?: string | number;
+  SUBTITULO_HOME_SITE?: string | number;
   descricao_rodape?: string | number;
+  DESCRICAO_RODAPE?: string | number;
   link_instagram?: string | number;
+  LINK_INSTAGRAM?: string | number;
   link_faceboock?: string | number;
+  LINK_FACEBOOCK?: string | number;
   whatsapp?: string | number;
+  WHATSAPP?: string | number;
   nome_corretor?: string | number;
+  NOME_CORRETOR?: string | number;
   endereco_contato_site?: string | number;
+  ENDERECO_CONTATO_SITE?: string | number;
   frase_contato_site?: string | number;
+  FRASE_CONTATO_SITE?: string | number;
   endereco_site?: string | number;
+  ENDERECO_SITE?: string | number;
   url_site?: string | number;
   URL_SITE?: string | number;
 }
@@ -67,6 +79,7 @@ export function HomePage() {
   const [homeImage, setHomeImage] = useState<string>('');
   const [homeImageLoaded, setHomeImageLoaded] = useState(false);
   const [contentVisible, setContentVisible] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const fallbackHomeImage =
     'https://69b97c0b315a7263c988316a.imgix.net/capa.jpg?fit=fill&auto=format';
@@ -109,6 +122,9 @@ export function HomePage() {
   useEffect(() => {
     const applyConfig = (cfg: SiteConfig) => {
       setConfig(cfg);
+      setHomeImage('');
+      setHomeImageLoaded(false);
+      setContentVisible(false);
 
       const imageUrl =
         String(cfg?.url_imagem_home_site ?? cfg?.URL_IMAGEM_HOME_SITE ?? '') ||
@@ -119,14 +135,22 @@ export function HomePage() {
 
       img.onload = () => {
         setHomeImage(imageUrl);
-        setHomeImageLoaded(true);
-        setTimeout(() => setContentVisible(true), 150);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setHomeImageLoaded(true);
+            setTimeout(() => setContentVisible(true), 220);
+          });
+        });
       };
 
       img.onerror = () => {
         setHomeImage(fallbackHomeImage);
-        setHomeImageLoaded(true);
-        setTimeout(() => setContentVisible(true), 150);
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setHomeImageLoaded(true);
+            setTimeout(() => setContentVisible(true), 220);
+          });
+        });
       };
     };
 
@@ -271,6 +295,7 @@ export function HomePage() {
 
   const subtitulo = String(
     config?.subtitulo_home_site ??
+    config?.SUBTITULO_HOME_SITE ??
     'Sua corretora de confiança para encontrar as melhores oportunidades do mercado imobiliário'
   );
 
@@ -339,10 +364,11 @@ export function HomePage() {
         image={seoImage}
       />
       <nav className="sticky top-0 z-50 border-b border-white/30 bg-white/80 backdrop-blur-xl shadow-[0_8px_30px_rgba(15,23,42,0.06)]">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
           <Link
             to="/"
             className="group flex items-center gap-4 transition-all duration-300"
+            onClick={() => setMobileMenuOpen(false)}
           >
             <div className="flex items-center gap-4">
               {configLoading ? (
@@ -361,42 +387,76 @@ export function HomePage() {
                 </div>
               )}
 
-              <div className="flex flex-col leading-tight">
-                <span className="text-[11px] uppercase tracking-[0.28em] text-amber-700 font-semibold">
+              <div className="flex min-w-0 flex-col leading-tight">
+                <span className="hidden text-[11px] uppercase tracking-[0.28em] text-amber-700 font-semibold sm:block">
                   Corretora de imóveis | Atendimento personalizado
                 </span>
-                <span className="font-semibold text-lg md:text-xl tracking-wide text-slate-900 transition-colors duration-300 group-hover:text-amber-700">
+                <span className="truncate font-semibold text-base md:text-xl tracking-wide text-slate-900 transition-colors duration-300 group-hover:text-amber-700">
                   {nomecorretor}
                 </span>
               </div>
             </div>
           </Link>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
-  <Link
-    to="/sobre"
-    className="inline-flex justify-center rounded-full border border-slate-200 bg-white/70 px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700"
-  >
-    Sobre
-  </Link>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white/80 text-slate-700 shadow-sm transition-colors hover:border-amber-200 hover:text-amber-700 sm:hidden"
+            aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
 
-  <Link
-    to="/contato"
-    className="inline-flex justify-center rounded-full bg-amber-600 text-white px-5 py-2.5 text-sm font-semibold shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-700"
-  >
-    Contato
-  </Link>
-</div>
+          <div className="hidden items-center gap-3 sm:flex">
+            <Link
+              to="/sobre"
+              className="inline-flex justify-center rounded-full border border-slate-200 bg-white/70 px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700"
+            >
+              Sobre
+            </Link>
+
+            <Link
+              to="/contato"
+              className="inline-flex justify-center rounded-full bg-amber-600 text-white px-5 py-2.5 text-sm font-semibold shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-amber-700"
+            >
+              Contato
+            </Link>
+          </div>
         </div>
+        {mobileMenuOpen && (
+          <div className="border-t border-slate-200 bg-white/95 px-4 py-4 sm:hidden">
+            <div className="flex flex-col gap-2">
+              <Link
+                to="/sobre"
+                onClick={() => setMobileMenuOpen(false)}
+                className="inline-flex justify-center rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition-all hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700"
+              >
+                Sobre
+              </Link>
+              <Link
+                to="/contato"
+                onClick={() => setMobileMenuOpen(false)}
+                className="inline-flex justify-center rounded-2xl bg-amber-600 px-4 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-amber-700"
+              >
+                Contato
+              </Link>
+            </div>
+          </div>
+        )}
       </nav>
 
-      <header className="relative overflow-hidden min-h-[720px] flex items-center px-6">
+      <header className="relative overflow-hidden min-h-[620px] md:min-h-[720px] flex items-center px-4 sm:px-6 bg-slate-100">
         <div
-          className={`absolute inset-0 bg-cover bg-center transition-all duration-[1400ms] ease-out ${homeImageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-110'
+          className={`absolute inset-0 bg-cover bg-center transition-all duration-[2200ms] ease-out ${homeImageLoaded ? 'opacity-100 scale-100 blur-0' : 'opacity-0 scale-105 blur-[3px]'
             }`}
           style={{
-            backgroundImage: `url('${homeImage || fallbackHomeImage}')`
+            backgroundImage: homeImage ? `url('${homeImage}')` : 'none'
           }}
+        />
+        <div
+          className={`absolute inset-0 bg-white transition-opacity duration-[2000ms] ease-out ${
+            homeImageLoaded ? 'opacity-0' : 'opacity-100'
+          }`}
         />
 
         <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/25 to-white/50" />
@@ -411,7 +471,7 @@ export function HomePage() {
             </div>
           ) : (
             <div
-              className={`text-center mb-14 transition-all duration-1000 ease-out ${contentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+              className={`text-center mb-10 md:mb-14 transition-all duration-1000 ease-out ${contentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
                 }`}
             >
               <div className="flex justify-center mb-6">
@@ -419,23 +479,23 @@ export function HomePage() {
                   <img
                     src={logoUrl}
                     alt="Logotipo"
-                    className="h-20 md:h-50 w-auto object-contain drop-shadow-sm"
+                    className="h-16 sm:h-20 md:h-50 w-auto object-contain drop-shadow-sm"
                   />
                 )}
               </div>
 
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 text-slate-900 tracking-tight drop-shadow-sm">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-slate-900 tracking-tight drop-shadow-sm">
                 {titulo}
               </h1>
 
-              <p className="text-slate-100 max-w-3xl mx-auto text-base md:text-lg leading-relaxed drop-shadow-md">
+              <p className="text-white max-w-3xl mx-auto text-base sm:text-lg md:text-xl leading-relaxed drop-shadow-[0_2px_10px_rgba(15,23,42,0.45)]">
                 {subtitulo}
               </p>
             </div>
           )}
 
           <div
-            className={`bg-white/80 backdrop-blur-md rounded-2xl p-6 md:p-8 max-w-5xl mx-auto shadow-2xl border border-white/70 transition-all duration-1000 ease-out ${contentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+            className={`bg-white/80 backdrop-blur-md rounded-2xl p-4 sm:p-6 md:p-8 max-w-5xl mx-auto shadow-2xl border border-white/70 transition-all duration-1000 ease-out ${contentVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
               }`}
           >
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -501,7 +561,7 @@ export function HomePage() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="text-sm text-slate-600 invisible md:visible">
+                <label className="hidden text-sm text-slate-600 md:block md:invisible">
                   ...
                 </label>
                 <button
@@ -517,7 +577,7 @@ export function HomePage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-16 bg-white">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-12 md:py-16 bg-white">
         {loading && (
           <div className="flex flex-col items-center justify-center py-32">
             <Loader2 className="animate-spin text-amber-600 mb-4" size={48} />

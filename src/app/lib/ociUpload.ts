@@ -3,7 +3,7 @@
 // Crie uma PAR com permissao de escrita no prefixo desejado.
 // Observacao: PAR do OCI permite upload/leitura, mas nao exclusao de objetos.
 // Exemplo de PAR URL: https://objectstorage.sa-saopaulo-1.oraclecloud.com/p/SEU_TOKEN/n/grjkkkmo3naa/b/bucket_imoveis/o/
-export const OCI_PAR_URL = 'https://objectstorage.sa-saopaulo-1.oraclecloud.com/p/zCZd6BMGeKi71qSHZpJbKmpVgey3f-AHqoXctCCtUZqrDCI6daWlUIwc8s9bStkp/n/grjkkkmo3naa/b/bucket_imoveis/o/'
+export const OCI_PAR_URL = 'https://objectstorage.sa-saopaulo-1.oraclecloud.com/p/3JV4Zv8vTfzj6RuhiNrkHXkWbuOO07CiHwyZhAmsiReiP1z26aaLdxiv1D1uKuEG/n/grjkkkmo3naa/b/bucket_imoveis/o/'
 
 // URL base usada para ler/exibir as imagens no site.
 // Se o bucket nao for publico, troque para uma URL de leitura valida

@@ -54,8 +54,7 @@ BEGIN
         p_items_per_page => 25,
         p_comments       => 'Retorna configuracoes do site (home, sobre, contato, redes sociais)',
         p_source         =>
-            'SELECT rota_sistema_site,
-                    titulo_home_site,
+            'SELECT titulo_home_site,
                     subtitulo_home_site,
                     url_imagem_home_site,
                     titulo_sobre_site,
@@ -171,8 +170,7 @@ BEGIN
                     quartos,
                     banheiros,
                     garagem,
-                    area,
-                    imagem
+                    area
              FROM imoveis.imoveis
              WHERE id_imovel = :id'
     );

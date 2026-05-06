@@ -22,13 +22,22 @@ interface SiteConfig {
   link_faceboock?: string | number;
   whatsapp?: string | number;
   nome_corretor?: string | number;
+  NOME_CORRETOR?: string | number;
   url_logotipo?: string;
   URL_LOGOTIPO?: string;
 
   titulo_sobre_site?: string | number;
+  TITULO_SOBRE_SITE?: string | number;
   subtitulo_sobre_site?: string | number;
+  SUBTITULO_SOBRE_SITE?: string | number;
   titulo_descricao_sobre_site?: string | number;
+  TITULO_DESCRICAO_SOBRE_SITE?: string | number;
   descricao_sobre_site?: string | number;
+  DESCRICAO_SOBRE_SITE?: string | number;
+  DESCRICAO_RODAPE?: string | number;
+  LINK_INSTAGRAM?: string | number;
+  LINK_FACEBOOCK?: string | number;
+  WHATSAPP?: string | number;
   url_foto_sobre_site?: string;
   URL_FOTO_SOBRE_SITE?: string;
 }
@@ -149,21 +158,22 @@ export function AboutPage() {
 
   const subtituloSobre = String(
     config?.subtitulo_sobre_site ??
+      config?.SUBTITULO_SOBRE_SITE ??
       'Sua parceira de confiança na realização do sonho da casa própria'
   );
 
   const tituloDescricaoSobre = String(
-    config?.titulo_descricao_sobre_site ?? 'Fabiane Niewierowska'
+    config?.titulo_descricao_sobre_site ?? 'Corretor de Imoveis'
   );
 
   const descricaoSobre = String(
     config?.descricao_sobre_site ??
-      'Fabiane Niewierowska é mais do que uma Corretora de Imóveis — é uma profissional que entende que cada imóvel carrega histórias, sonhos e novos começos.'
+      'Corretor de Imoveis é mais do que um profissional do mercado — é alguém que entende que cada imóvel carrega histórias, sonhos e novos começos.'
   );
 
   const rodape = String(
     config?.descricao_rodape ??
-      '© 2026 Fabiane Niewierowska - Corretora de Imóveis. Todos os direitos reservados.'
+      '© 2026 Corretor de Imoveis. Todos os direitos reservados.'
   );
 
   const instagram = String(config?.link_instagram ?? '#');
@@ -281,7 +291,7 @@ export function AboutPage() {
                 {tituloSobre}
               </h1>
 
-              <p className="text-slate-100 max-w-3xl mx-auto text-base md:text-lg leading-relaxed drop-shadow-md">
+              <p className="text-slate-700 max-w-3xl mx-auto text-base md:text-lg leading-relaxed drop-shadow-sm">
                 {subtituloSobre}
               </p>
             </div>

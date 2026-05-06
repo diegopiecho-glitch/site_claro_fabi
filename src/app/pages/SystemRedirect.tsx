@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { API } from '../lib/api';
+
 const CONFIG_CACHE_KEY = 'site_config_home';
 const CONFIG_URL = API.CONFIG_LISTA;
 
 interface SiteConfig {
-  rota_sistema_site?: string | number;
-  ROTA_SISTEMA_SITE?: string | number;
+  url_site?: string | number;
+  URL_SITE?: string | number;
 }
 
 export function SystemRedirect() {
@@ -14,8 +15,8 @@ export function SystemRedirect() {
   useEffect(() => {
     const getSystemUrlFromConfig = (config: SiteConfig | null | undefined) => {
       const targetUrl = String(
-        config?.rota_sistema_site ??
-        config?.ROTA_SISTEMA_SITE ??
+        config?.url_site ??
+        config?.URL_SITE ??
         ''
       ).trim();
 
@@ -24,7 +25,7 @@ export function SystemRedirect() {
 
     const redirectToSystem = (targetUrl: string | null) => {
       if (!targetUrl) {
-        setError('A rota do sistema não está configurada no site.');
+        setError('A URL do sistema nao esta configurada no site.');
         return;
       }
 
@@ -48,7 +49,7 @@ export function SystemRedirect() {
         const response = await fetch(CONFIG_URL, { cache: 'no-store' });
 
         if (!response.ok) {
-          throw new Error('Erro ao carregar configuração do site');
+          throw new Error('Erro ao carregar configuracao do site');
         }
 
         const data = await response.json();
@@ -57,7 +58,7 @@ export function SystemRedirect() {
 
         redirectToSystem(getSystemUrlFromConfig(config));
       } catch {
-        setError('Não foi possível carregar a rota do sistema no momento.');
+        setError('Nao foi possivel carregar a URL do sistema no momento.');
       }
     };
 

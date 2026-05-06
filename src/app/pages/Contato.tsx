@@ -6,7 +6,7 @@ import {
   MessageCircle,
   Home,
   MapPin,
-  Phone
+  Phone,
 } from 'lucide-react';
 import { SocialButton } from '../components/SocialButton';
 import { Seo } from '../components/Seo';
@@ -38,7 +38,61 @@ interface SiteConfig {
 }
 
 const CONFIG_CACHE_KEY = 'site_config_home';
-const CONFIG_CACHE_TTL = 1000 * 60 * 1; // 1 minuto
+const CONFIG_CACHE_TTL = 1000 * 60 * 1;
+
+function normalizeMapUrl(rawUrl: string): string {
+  return rawUrl.trim();
+}
+
+function isEmbeddableMapUrl(rawUrl: string): boolean {
+  const url = normalizeMapUrl(rawUrl);
+
+  return (
+    url.startsWith('https://www.google.com/maps/embed') ||
+    url.startsWith('https://google.com/maps/embed')
+  );
+}
+
+function isExternalMapLink(rawUrl: string): boolean {
+  const url = normalizeMapUrl(rawUrl);
+
+  if (!url) return false;
+
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    const path = parsed.pathname.toLowerCase();
+
+    if (host === 'maps.app.goo.gl' || host === 'goo.gl') {
+      return true;
+    }
+
+    if (host.endsWith('google.com') && !path.startsWith('/maps/embed')) {
+      return true;
+    }
+  } catch {
+    return false;
+  }
+
+  return (
+    url.startsWith('https://maps.app.goo.gl/') ||
+    url.startsWith('https://www.google.com/maps/') ||
+    url.startsWith('https://www.google.com/') ||
+    url.startsWith('https://google.com/maps/') ||
+    url.startsWith('https://google.com/') ||
+    url.startsWith('https://goo.gl/maps/')
+  );
+}
+
+function getGoogleMapsOpenUrl(rawUrl: string, endereco: string): string | null {
+  const url = normalizeMapUrl(rawUrl);
+  if (isExternalMapLink(url)) return url;
+
+  const enderecoNormalizado = endereco.trim();
+  if (!enderecoNormalizado) return null;
+
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoNormalizado)}`;
+}
 
 export function ContactPage() {
   const [config, setConfig] = useState<SiteConfig | null>(null);
@@ -60,7 +114,7 @@ export function ContactPage() {
 
       return parsed.data;
     } catch (error) {
-      console.error('Erro ao ler cache da configuração:', error);
+      console.error('Erro ao ler cache da configuracao:', error);
       localStorage.removeItem(CONFIG_CACHE_KEY);
       return null;
     }
@@ -72,11 +126,11 @@ export function ContactPage() {
         CONFIG_CACHE_KEY,
         JSON.stringify({
           timestamp: Date.now(),
-          data
+          data,
         })
       );
     } catch (error) {
-      console.error('Erro ao salvar cache da configuração:', error);
+      console.error('Erro ao salvar cache da configuracao:', error);
     }
   };
 
@@ -100,7 +154,7 @@ export function ContactPage() {
         const response = await fetch(API.CONFIG_LISTA);
 
         if (!response.ok) {
-          throw new Error('Erro ao carregar configuração do site');
+          throw new Error('Erro ao carregar configuracao do site');
         }
 
         const data = await response.json();
@@ -121,31 +175,34 @@ export function ContactPage() {
     fetchConfig();
   }, []);
 
-  const nomecorretor = String(config?.nome_corretor ?? 'Corretor de Imóveis');
+  const nomecorretor = String(config?.nome_corretor ?? 'Corretor de Imoveis');
   const logoUrl = String(config?.url_logotipo ?? config?.URL_LOGOTIPO ?? '');
 
   const tituloContato = String(config?.titulo_contato_site ?? 'Entre em Contato');
   const subtituloContato = String(
     config?.subtitulo_contato_site ??
-      'Estou pronta para ajudar você a comprar, vender ou investir com segurança e tranquilidade.'
+      'Estou pronta para ajudar voce a comprar, vender ou investir com seguranca e tranquilidade.'
   );
 
   const fraseContato = String(
     config?.frase_contato_site ??
-      'Será um prazer conversar com você e entender exatamente o que procura.'
+      'Sera um prazer conversar com voce e entender exatamente o que procura.'
   );
 
-  const enderecoContato = String(config?.endereco_contato_site ?? 'Endereço não informado');
+  const enderecoContato = String(config?.endereco_contato_site ?? 'Endereco nao informado');
   const telefone1 = String(config?.telefone_contato1 ?? '');
   const telefone2 = String(config?.telefone_contato2 ?? '');
-  const urlMapa = String(config?.url_mapa_contato_site ?? '');
+  const urlMapa = normalizeMapUrl(String(config?.url_mapa_contato_site ?? ''));
+  const mapaEmbeddable = isEmbeddableMapUrl(urlMapa);
+  const mapaLinkExterno = isExternalMapLink(urlMapa);
+  const mapaOpenUrl = getGoogleMapsOpenUrl(urlMapa, enderecoContato);
   const baseUrl = String(
     config?.endereco_site ?? config?.url_site ?? config?.URL_SITE ?? ''
   ).trim();
 
   const rodape = String(
     config?.descricao_rodape ??
-      '© 2026 Corretor de Imóveis. Todos os direitos reservados.'
+      '© 2026 Corretor de Imoveis. Todos os direitos reservados.'
   );
 
   const instagram = String(config?.link_instagram ?? '#');
@@ -203,7 +260,7 @@ export function ContactPage() {
 
               <div className="flex flex-col leading-tight">
                 <span className="text-[11px] uppercase tracking-[0.28em] text-amber-700 font-semibold">
-                  Corretora de imóveis | Atendimento personalizado
+                  Corretora de imoveis | Atendimento personalizado
                 </span>
                 <span className="font-semibold text-lg md:text-xl tracking-wide text-slate-900 transition-colors duration-300 group-hover:text-amber-700">
                   {nomecorretor}
@@ -285,7 +342,7 @@ export function ContactPage() {
                 </div>
                 <div>
                   <h3 className="text-sm uppercase tracking-[0.18em] text-slate-500 font-medium mb-1">
-                    Endereço
+                    Endereco
                   </h3>
                   <p className="text-slate-900 text-lg">{enderecoContato}</p>
                 </div>
@@ -348,27 +405,58 @@ export function ContactPage() {
               contentVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-6'
             }`}
           >
-            {urlMapa ? (
-              <iframe
-                src={urlMapa}
-                width="100%"
-                height="100%"
-                style={{ border: 0, minHeight: '420px' }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Mapa de localização"
-              />
+            {mapaEmbeddable ? (
+              <div className="relative h-full min-h-[420px]">
+                <iframe
+                  src={urlMapa}
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0, minHeight: '420px' }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Mapa de localizacao"
+                />
+                {mapaOpenUrl && (
+                  <a
+                    href={mapaOpenUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Abrir localizacao no Google Maps"
+                    className="absolute inset-0 z-10"
+                  />
+                )}
+              </div>
+            ) : mapaLinkExterno ? (
+              <div className="h-full min-h-[420px] flex items-center justify-center text-center px-8">
+                <div className="max-w-md">
+                  <MapPin className="mx-auto mb-4 text-amber-600" size={56} />
+                  <h3 className="text-xl font-semibold text-slate-700 mb-2">
+                    Abrir localizacao no Google Maps
+                  </h3>
+                  <p className="text-slate-500 mb-6">
+                    O link salvo e um link externo do Google Maps e nao pode ser exibido dentro do site como iframe.
+                  </p>
+                  <a
+                    href={mapaOpenUrl ?? urlMapa}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white px-6 py-3 font-semibold shadow-lg transition-all hover:-translate-y-0.5"
+                  >
+                    <MapPin size={18} />
+                    <span>Abrir no Google Maps</span>
+                  </a>
+                </div>
+              </div>
             ) : (
               <div className="h-full min-h-[420px] flex items-center justify-center text-center px-8">
                 <div>
                   <MapPin className="mx-auto mb-4 text-slate-400" size={56} />
                   <h3 className="text-xl font-semibold text-slate-700 mb-2">
-                    Mapa não disponível
+                    Mapa nao disponivel
                   </h3>
                   <p className="text-slate-500">
-                    Adicione a URL do mapa na configuração do site para exibir a
-                    localização aqui.
+                    Adicione a URL do mapa na configuracao do site para exibir a localizacao aqui.
                   </p>
                 </div>
               </div>
@@ -382,7 +470,7 @@ export function ContactPage() {
           <h3 className="mb-6 text-2xl font-semibold">Siga-me nas Redes Sociais</h3>
 
           <p className="text-slate-300 mb-8 max-w-2xl mx-auto">
-            Acompanhe novidades, dicas e os melhores imóveis disponíveis
+            Acompanhe novidades, dicas e os melhores imoveis disponiveis
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">
