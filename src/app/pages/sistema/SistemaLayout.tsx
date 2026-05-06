@@ -146,7 +146,7 @@ export function SistemaLayout() {
               <Menu size={20} />
             </button>
             <div className="min-w-0 text-right">
-              <p className="truncate text-sm font-semibold text-slate-900">Sistema ImobiliÃ¡rio</p>
+              <p className="truncate text-sm font-semibold text-slate-900">Sistema Imobiliario</p>
               <p className="truncate text-xs text-slate-500">Painel administrativo</p>
             </div>
           </div>
