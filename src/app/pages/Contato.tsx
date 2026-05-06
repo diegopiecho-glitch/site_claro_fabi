@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { SocialButton } from '../components/SocialButton';
 import { Seo } from '../components/Seo';
+import { API } from '../lib/api';
 
 interface SiteConfig {
   titulo_home_site?: string | number;
@@ -96,9 +97,7 @@ export function ContactPage() {
           return;
         }
 
-        const response = await fetch(
-          'https://gfeee0b664f71e7-dbimoveis.adb.sa-saopaulo-1.oraclecloudapps.com/ords/imoveis/customizacao_site/'
-        );
+        const response = await fetch(API.CONFIG_LISTA);
 
         if (!response.ok) {
           throw new Error('Erro ao carregar configuração do site');

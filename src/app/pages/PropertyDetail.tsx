@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { SocialButton } from '../components/SocialButton';
 import { Seo } from '../components/Seo';
+import { API } from '../lib/api';
 
 interface PropertyDetails {
   id_imovel: number;
@@ -40,8 +41,15 @@ interface Photo {
   id_imovel: number;
   url: string;
   ordem?: number;
+  foto_principal?: 'S' | 'N';
   [key: string]: any;
 }
+
+const getPhotoPrincipal = (photo: Photo) => {
+  return String(
+    photo.foto_principal ?? photo.FOTO_PRINCIPAL ?? photo.principal ?? photo.PRINCIPAL ?? 'N'
+  ).trim().toUpperCase() === 'S' ? 'S' : 'N';
+};
 
 const getPhotoOrder = (photo: Photo) => {
   const rawOrder =
@@ -106,6 +114,7 @@ const normalizePhotos = (photosData: unknown, propertyId?: number): Photo[] => {
       id: getPhotoId(photo),
       id_imovel: Number(photo.id_imovel ?? photo.ID_IMOVEL ?? 0),
       url: getPhotoUrl(photo),
+      foto_principal: getPhotoPrincipal(photo),
       ordem:
         getPhotoOrder(photo) === Number.MAX_SAFE_INTEGER
           ? getPhotoOrderFromUrl(photo)
@@ -117,6 +126,10 @@ const normalizePhotos = (photosData: unknown, propertyId?: number): Photo[] => {
     )
     .filter((photo) => Boolean(photo.url))
     .sort((a, b) => {
+      if ((a.foto_principal ?? 'N') !== (b.foto_principal ?? 'N')) {
+        return (b.foto_principal ?? 'N').localeCompare(a.foto_principal ?? 'N');
+      }
+
       const orderDiff = (a.ordem ?? Number.MAX_SAFE_INTEGER) - (b.ordem ?? Number.MAX_SAFE_INTEGER);
       if (orderDiff !== 0) return orderDiff;
 
@@ -145,10 +158,7 @@ export function PropertyDetail() {
         setError(null);
 
         // Buscar detalhes do imóvel
-        const detailsResponse = await fetch(
-          `https://gfeee0b664f71e7-dbimoveis.adb.sa-saopaulo-1.oraclecloudapps.com/ords/imoveis/imoveis/detalhe/${id}`,
-          { cache: 'no-store' }
-        );
+        const detailsResponse = await fetch(API.IMOVEL_DETALHE(id), { cache: 'no-store' });
 
         if (!detailsResponse.ok) {
           throw new Error('Erro ao carregar detalhes do imóvel');
@@ -160,10 +170,7 @@ export function PropertyDetail() {
         setProperty(details);
 
         // Buscar fotos do imóvel
-        const photosResponse = await fetch(
-          'https://gfeee0b664f71e7-dbimoveis.adb.sa-saopaulo-1.oraclecloudapps.com/ords/imoveis/fotodetalheimovel/',
-          { cache: 'no-store' }
-        );
+        const photosResponse = await fetch(API.FOTOS_LISTA, { cache: 'no-store' });
 
         if (photosResponse.ok) {
           const photosData = await photosResponse.json();

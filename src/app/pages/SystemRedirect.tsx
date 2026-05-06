@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
+import { API } from '../lib/api';
 const CONFIG_CACHE_KEY = 'site_config_home';
-const CONFIG_URL =
-  'https://gfeee0b664f71e7-dbimoveis.adb.sa-saopaulo-1.oraclecloudapps.com/ords/imoveis/customizacao_site/';
+const CONFIG_URL = API.CONFIG_LISTA;
 
 interface SiteConfig {
   rota_sistema_site?: string | number;

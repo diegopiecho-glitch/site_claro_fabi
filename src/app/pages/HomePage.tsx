@@ -14,6 +14,7 @@ import { Link } from 'react-router';
 import { PropertyCard } from '../components/PropertyCard';
 import { SocialButton } from '../components/SocialButton';
 import { Seo } from '../components/Seo';
+import { API } from '../lib/api';
 
 interface Property {
   id: number;
@@ -140,9 +141,7 @@ export function HomePage() {
           return;
         }
 
-        const response = await fetch(
-          'https://gfeee0b664f71e7-dbimoveis.adb.sa-saopaulo-1.oraclecloudapps.com/ords/imoveis/customizacao_site/'
-        );
+        const response = await fetch(API.CONFIG_LISTA);
 
         if (!response.ok) {
           throw new Error('Erro ao carregar configuração do site');
@@ -174,9 +173,7 @@ export function HomePage() {
         setLoading(true);
         setError(null);
 
-        const response = await fetch(
-          'https://gfeee0b664f71e7-dbimoveis.adb.sa-saopaulo-1.oraclecloudapps.com/ords/imoveis/cardhomesite/'
-        );
+        const response = await fetch(API.IMOVEIS_LISTA);
 
         if (!response.ok) {
           throw new Error('Erro ao carregar imóveis');
@@ -190,11 +187,12 @@ export function HomePage() {
             id: Number(item.id || item.ID || item.imovel_id || item.id_imovel || 0),
             title: item.title || item.titulo || item.nome || 'Sem título',
             subtitle:
+              item.bairro ||
+              item.BAIRRO ||
               item.subtitle ||
               item.subtitulo ||
               item.endereco ||
               item.descricao ||
-              item.bairro ||
               '',
             price: parseFloat(
               (item.price || item.preco || item.valor || '0')
