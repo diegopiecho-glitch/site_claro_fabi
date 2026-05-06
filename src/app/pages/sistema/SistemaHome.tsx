@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router'
-import { Building2, Settings, Plus, Eye, Home, CheckCircle2, XCircle, MapPinned, Loader2, AlertCircle } from 'lucide-react'
+import { Building2, Settings, Plus, Eye, Home, CheckCircle2, XCircle, Loader2, AlertCircle } from 'lucide-react'
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
 import { API, apiFetch } from '../../lib/api'
 import { PropertyCard } from '../../components/PropertyCard'
@@ -217,73 +217,61 @@ export function SistemaHome() {
         </div>
       </div>
 
-      <div className="mb-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
-            <Building2 size={24} />
+      <div className="mb-8 grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,0.8fr)_minmax(0,0.8fr)_minmax(300px,1fr)_minmax(260px,0.9fr)]">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+            <Building2 size={22} />
           </div>
-          <p className="text-sm text-slate-500">Total de imoveis cadastrados</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">
+          <p className="text-xs sm:text-sm text-slate-500">Imoveis cadastrados</p>
+          <p className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
             {loading ? <Loader2 className="animate-spin text-amber-600" size={28} /> : totalImoveis}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-green-100 text-green-700">
-            <CheckCircle2 size={24} />
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-green-100 text-green-700">
+            <CheckCircle2 size={22} />
           </div>
-          <p className="text-sm text-slate-500">Imoveis ativos</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">
+          <p className="text-xs sm:text-sm text-slate-500">Imoveis ativos</p>
+          <p className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
             {loading ? <Loader2 className="animate-spin text-amber-600" size={28} /> : totalAtivos}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-200 text-slate-700">
-            <XCircle size={24} />
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-200 text-slate-700">
+            <XCircle size={22} />
           </div>
-          <p className="text-sm text-slate-500">Imoveis inativos</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">
+          <p className="text-xs sm:text-sm text-slate-500">Imoveis inativos</p>
+          <p className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
             {loading ? <Loader2 className="animate-spin text-amber-600" size={28} /> : totalInativos}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-700">
-            <MapPinned size={24} />
-          </div>
-          <p className="text-sm text-slate-500">Cidades com cadastro</p>
-          <p className="mt-2 text-3xl font-bold text-slate-900">
-            {loading ? <Loader2 className="animate-spin text-amber-600" size={28} /> : graficoCidades.length}
-          </p>
-        </div>
-      </div>
-
-      <div className="mb-8 grid grid-cols-1 gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="mb-5">
-            <h2 className="text-xl font-semibold text-slate-900">Imoveis por cidade</h2>
-            <p className="text-sm text-slate-500">Distribuicao dos cadastros por municipio</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="mb-4">
+            <h2 className="text-base font-semibold text-slate-900">Imoveis por cidade</h2>
+            <p className="text-xs sm:text-sm text-slate-500">Distribuicao dos cadastros por municipio</p>
           </div>
 
           {loading ? (
-            <div className="flex h-[320px] items-center justify-center">
-              <Loader2 className="animate-spin text-amber-600" size={34} />
+            <div className="flex h-[190px] items-center justify-center">
+              <Loader2 className="animate-spin text-amber-600" size={30} />
             </div>
           ) : graficoCidades.length === 0 ? (
-            <div className="flex h-[320px] items-center justify-center text-slate-400">
+            <div className="flex h-[190px] items-center justify-center text-center text-sm text-slate-400">
               Nenhum dado disponivel para o grafico.
             </div>
           ) : (
-            <div className="h-[320px]">
+            <div className="h-[190px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={graficoCidades}
                     dataKey="value"
                     nameKey="name"
-                    innerRadius={68}
-                    outerRadius={110}
+                    innerRadius={36}
+                    outerRadius={66}
                     paddingAngle={2}
                   >
                     {graficoCidades.map((entry, index) => (
@@ -297,38 +285,36 @@ export function SistemaHome() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="mb-5">
-            <h2 className="text-xl font-semibold text-slate-900">Resumo por cidade</h2>
-            <p className="text-sm text-slate-500">As cidades com mais cadastros no sistema</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="mb-4">
+            <h3 className="text-base font-semibold text-slate-900">Resumo por cidade</h3>
+            <p className="text-xs sm:text-sm text-slate-500">As cidades com mais cadastros no sistema</p>
           </div>
 
-          <div className="space-y-3">
-            {loading && (
-              <div className="flex items-center justify-center py-16">
-                <Loader2 className="animate-spin text-amber-600" size={30} />
-              </div>
-            )}
-
-            {!loading && graficoCidades.length === 0 && (
-              <div className="rounded-xl bg-slate-50 p-4 text-sm text-slate-500">
-                Nenhuma cidade encontrada.
-              </div>
-            )}
-
-            {!loading && graficoCidades.map((item, index) => (
-              <div key={item.name} className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <span
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: CORES_GRAFICO[index % CORES_GRAFICO.length] }}
-                  />
-                  <span className="font-medium text-slate-800">{item.name}</span>
+          {loading ? (
+            <div className="flex h-[190px] items-center justify-center">
+              <Loader2 className="animate-spin text-amber-600" size={30} />
+            </div>
+          ) : graficoCidades.length === 0 ? (
+            <div className="flex h-[190px] items-center justify-center text-sm text-slate-400">
+              Nenhuma cidade encontrada.
+            </div>
+          ) : (
+            <div className="space-y-2.5">
+              {graficoCidades.map((item, index) => (
+                <div key={item.name} className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-3">
+                  <div className="flex items-center gap-3">
+                    <span
+                      className="h-3 w-3 rounded-full"
+                      style={{ backgroundColor: CORES_GRAFICO[index % CORES_GRAFICO.length] }}
+                    />
+                    <span className="font-medium text-slate-800">{item.name}</span>
+                  </div>
+                  <span className="text-sm font-semibold text-slate-600">{item.value}</span>
                 </div>
-                <span className="text-sm font-semibold text-slate-600">{item.value}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
