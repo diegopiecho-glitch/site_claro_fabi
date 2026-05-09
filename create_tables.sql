@@ -1,7 +1,8 @@
 -- =============================================================
 -- DDL - Oracle Autonomous Database (ORDS)
 -- Owner:   IMOVEIS
--- Tabelas: CUSTOMIZACAO_SITE, IMOVEIS, FOTOS_IMOVEL
+-- Tabelas: CUSTOMIZACAO_SITE, IMOVEIS, FOTOS_IMOVEL,
+--          CARACTERISTICA, CARACTERISTICA_IMOVEL
 -- View:    CARDHOMESITE
 -- =============================================================
 
@@ -119,17 +120,75 @@ CREATE TABLE imoveis.fotos_imovel (
     id_imovel       NUMBER          NOT NULL,
     url             VARCHAR2(2000)  NOT NULL,
     ordem           NUMBER(5)       DEFAULT 0,
+    foto_principal  VARCHAR2(1)     DEFAULT 'N' NOT NULL,
     dt_criacao      TIMESTAMP       DEFAULT SYSTIMESTAMP,
 
     CONSTRAINT fk_fotos_imovel
         FOREIGN KEY (id_imovel)
         REFERENCES imoveis.imoveis (id_imovel)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+
+    CONSTRAINT ck_fotos_principal
+        CHECK (foto_principal IN ('S', 'N'))
 );
 
 COMMENT ON TABLE  imoveis.fotos_imovel           IS 'Fotos da galeria do detalhe do imovel. Filtradas no frontend por id_imovel.';
 COMMENT ON COLUMN imoveis.fotos_imovel.url       IS 'URL publica da imagem';
 COMMENT ON COLUMN imoveis.fotos_imovel.ordem     IS 'Ordem de exibicao no carrossel. Menor numero aparece primeiro.';
+COMMENT ON COLUMN imoveis.fotos_imovel.foto_principal IS 'S = foto principal do imovel, N = foto comum.';
+
+
+-- =============================================================
+-- TABELA: CARACTERISTICA
+-- Cadastro das caracteristicas disponiveis para os imoveis
+-- =============================================================
+CREATE TABLE imoveis.caracteristica (
+    id_caracteristica  NUMBER         GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    descricao          VARCHAR2(100)  NOT NULL,
+    ativo              VARCHAR2(1)    DEFAULT 'S' NOT NULL,
+    dt_criacao         TIMESTAMP      DEFAULT SYSTIMESTAMP,
+    dt_atualizacao     TIMESTAMP      DEFAULT SYSTIMESTAMP,
+
+    CONSTRAINT ck_caracteristica_ativo
+        CHECK (ativo IN ('S', 'N'))
+);
+
+COMMENT ON TABLE  imoveis.caracteristica IS 'Cadastro mestre de caracteristicas que podem ser vinculadas aos imoveis.';
+COMMENT ON COLUMN imoveis.caracteristica.ativo IS 'S = ativo, N = inativo.';
+
+
+-- =============================================================
+-- TABELA: CARACTERISTICA_IMOVEL
+-- Relaciona imoveis com suas caracteristicas
+-- =============================================================
+CREATE TABLE imoveis.caracteristica_imovel (
+    id_caracteristica_imovel  NUMBER         GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_imovel                 NUMBER         NOT NULL,
+    id_caracteristica         NUMBER         NOT NULL,
+    qtd                       NUMBER         NOT NULL,
+    observacao                VARCHAR2(100),
+    dt_criacao                TIMESTAMP      DEFAULT SYSTIMESTAMP,
+    dt_atualizacao            TIMESTAMP      DEFAULT SYSTIMESTAMP,
+
+    CONSTRAINT fk_caract_imovel_imovel
+        FOREIGN KEY (id_imovel)
+        REFERENCES imoveis.imoveis (id_imovel)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_caract_imovel_caract
+        FOREIGN KEY (id_caracteristica)
+        REFERENCES imoveis.caracteristica (id_caracteristica)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uk_caract_imovel
+        UNIQUE (id_imovel, id_caracteristica),
+
+    CONSTRAINT ck_caract_imovel_qtd
+        CHECK (qtd >= 0)
+);
+
+COMMENT ON TABLE  imoveis.caracteristica_imovel IS 'Relacionamento entre imoveis e caracteristicas com quantidade e observacao opcional.';
+COMMENT ON COLUMN imoveis.caracteristica_imovel.qtd IS 'Quantidade da caracteristica no imovel.';
 
 
 -- =============================================================
@@ -140,6 +199,9 @@ CREATE INDEX idx_imoveis_cidade      ON imoveis.imoveis (cidade);
 CREATE INDEX idx_imoveis_ativo       ON imoveis.imoveis (ativo);
 CREATE INDEX idx_fotos_id_imovel     ON imoveis.fotos_imovel (id_imovel);
 CREATE INDEX idx_fotos_ordem         ON imoveis.fotos_imovel (id_imovel, ordem);
+CREATE INDEX idx_caracteristica_ativo ON imoveis.caracteristica (ativo);
+CREATE INDEX idx_caract_imovel_imovel ON imoveis.caracteristica_imovel (id_imovel);
+CREATE INDEX idx_caract_imovel_caract ON imoveis.caracteristica_imovel (id_caracteristica);
 
 
 -- =============================================================

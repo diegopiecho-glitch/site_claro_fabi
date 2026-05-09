@@ -8,6 +8,8 @@
 --   GET /ords/imoveis/cardhomesite/
 --   GET /ords/imoveis/imoveis/detalhe/:id
 --   GET /ords/imoveis/fotodetalheimovel/
+--   GET /ords/imoveis/caracteristicas/
+--   GET /ords/imoveis/imoveis/caracteristicas/:id
 -- =============================================================
 
 
@@ -22,6 +24,87 @@ BEGIN
         p_url_mapping_pattern => 'imoveis',
         p_auto_rest_auth      => FALSE
     );
+    COMMIT;
+END;
+/
+
+
+-- =============================================================
+-- MODULO: caracteristicas
+-- Endpoint: GET /ords/imoveis/caracteristicas/
+-- Tabela:   IMOVEIS.CARACTERISTICA
+-- Uso:      site publico e sistema administrativo
+-- =============================================================
+BEGIN
+    ORDS.DEFINE_MODULE(
+        p_module_name    => 'caracteristicas',
+        p_base_path      => '/caracteristicas/',
+        p_items_per_page => 200,
+        p_status         => 'PUBLISHED',
+        p_comments       => 'Cadastro de caracteristicas dos imoveis'
+    );
+
+    ORDS.DEFINE_TEMPLATE(
+        p_module_name => 'caracteristicas',
+        p_pattern     => '.'
+    );
+
+    ORDS.DEFINE_HANDLER(
+        p_module_name    => 'caracteristicas',
+        p_pattern        => '.',
+        p_method         => 'GET',
+        p_source_type    => ORDS.source_type_collection_feed,
+        p_items_per_page => 200,
+        p_comments       => 'Retorna todas as caracteristicas cadastradas',
+        p_source         =>
+            'SELECT id_caracteristica,
+                    descricao,
+                    ativo,
+                    sessao
+             FROM imoveis.caracteristica
+             ORDER BY descricao, id_caracteristica'
+    );
+
+    COMMIT;
+END;
+/
+
+
+-- =============================================================
+-- MODULO: imoveis
+-- Endpoint: GET /ords/imoveis/imoveis/caracteristicas/:id
+-- Uso:      caracteristicas vinculadas a um imovel
+-- Obs.:     reaproveita o modulo "imoveis" ja existente
+-- =============================================================
+BEGIN
+    ORDS.DEFINE_TEMPLATE(
+        p_module_name => 'imoveis',
+        p_pattern     => 'caracteristicas/:id'
+    );
+
+    ORDS.DEFINE_HANDLER(
+        p_module_name    => 'imoveis',
+        p_pattern        => 'caracteristicas/:id',
+        p_method         => 'GET',
+        p_source_type    => ORDS.source_type_collection_feed,
+        p_items_per_page => 200,
+        p_comments       => 'Retorna as caracteristicas vinculadas ao imovel informado',
+        p_source         =>
+            'SELECT ci.id_caracteristica_imovel,
+                    ci.id_imovel,
+                    ci.id_caracteristica,
+                    c.descricao,
+                    c.ativo,
+                    c.sessao,
+                    ci.qtd,
+                    ci.observacao
+             FROM imoveis.caracteristica_imovel ci
+             JOIN imoveis.caracteristica c
+               ON c.id_caracteristica = ci.id_caracteristica
+             WHERE ci.id_imovel = :id
+             ORDER BY c.descricao, ci.id_caracteristica_imovel'
+    );
+
     COMMIT;
 END;
 /
@@ -212,7 +295,8 @@ BEGIN
             'SELECT id_foto,
                     id_imovel,
                     url,
-                    ordem
+                    ordem,
+                    foto_principal
              FROM imoveis.fotos_imovel
              ORDER BY id_imovel, ordem, id_foto'
     );

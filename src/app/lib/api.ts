@@ -8,7 +8,9 @@ export const API = {
   IMOVEIS_LISTA:              `${ORDS_BASE}/cardhomesite/`,
   IMOVEIS_SISTEMA_LISTA:      `${ORDS_BASE}/imovel/`,
   IMOVEL_DETALHE: (id: number | string) => `${ORDS_BASE}/imoveis/detalhe/${id}`,
+  IMOVEL_CARACTERISTICAS: (id: number | string) => `${ORDS_BASE}/imoveis/caracteristicas/${id}`,
   FOTOS_LISTA:                `${ORDS_BASE}/fotodetalheimovel/`,
+  CARACTERISTICAS_LISTA:      `${ORDS_BASE}/caracteristicas/`,
   CONFIG_LISTA:               `${ORDS_BASE}/customizacao_site/`,
 
   // Autenticacao administrativa
@@ -18,12 +20,16 @@ export const API = {
 
   // Escrita - auto-REST (requer create_ords_admin.sql)
   IMOVEL_CRIAR:               `${ORDS_BASE}/admin/imovel/`,
-  IMOVEL_ATUALIZAR: (id: number) => `${ORDS_BASE}/admin/imovel/${id}`,
-  IMOVEL_EXCLUIR:   (id: number) => `${ORDS_BASE}/admin/imovel/excluir/${id}`,
+  IMOVEL_ATUALIZAR:           (id: number | string) => `${ORDS_BASE}/admin/imovel/${id}`,
+  IMOVEL_EXCLUIR:             (id: number | string) => `${ORDS_BASE}/admin/imovel/excluir/${id}`,
   FOTO_CRIAR:                 `${ORDS_BASE}/admin/foto/`,
-  FOTO_ATUALIZAR:   (id: number) => `${ORDS_BASE}/admin/foto/atualizar/${id}`,
-  FOTO_EXCLUIR:     (id: number) => `${ORDS_BASE}/admin/foto/excluir/${id}`,
-  CONFIG_ATUALIZAR: (id: number) => `${ORDS_BASE}/admin/config/${id}`,
+  FOTO_ATUALIZAR:             (id: number | string) => `${ORDS_BASE}/admin/foto/atualizar/${id}`,
+  FOTO_EXCLUIR:               (id: number | string) => `${ORDS_BASE}/admin/foto/excluir/${id}`,
+  CARACTERISTICA_CRIAR:       `${ORDS_BASE}/admin/caracteristica/`,
+  CARACTERISTICA_ATUALIZAR:   `${ORDS_BASE}/admin/caracteristica/atualizar`,
+  CARACTERISTICA_EXCLUIR:     `${ORDS_BASE}/admin/caracteristica/excluir`,
+  IMOVEL_CARACTERISTICAS_SINCRONIZAR: `${ORDS_BASE}/admin/caracteristica-imovel/sincronizar`,
+  CONFIG_ATUALIZAR:           (id: number | string) => `${ORDS_BASE}/admin/config/${id}`,
 }
 
 function getSessionToken(): string {

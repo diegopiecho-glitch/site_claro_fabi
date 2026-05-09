@@ -70,14 +70,22 @@ export function PropertyCard({
       </div>
 
       <div className="p-5">
-        <h3 className="mb-2 text-slate-900 transition-colors group-hover:text-amber-600">
-          {property.title}
-        </h3>
+        <div className="mb-3 flex items-start gap-2">
+          <h3 className="text-slate-900 transition-colors group-hover:text-amber-600">
+            {property.title}
+          </h3>
 
-        {subtitleText && (
+          {subtitleText && (
+            <p className="line-clamp-2 text-sm text-slate-600">
+              {subtitleText}
+            </p>
+          )}
+        </div>
+
+        {cityText && (
           <div className="mb-4 flex items-start gap-2">
             <MapPin size={16} className="mt-0.5 flex-shrink-0 text-slate-400" />
-            <p className="line-clamp-2 text-sm text-slate-600">{subtitleText}</p>
+            <p className="line-clamp-2 text-sm text-slate-600">{cityText}</p>
           </div>
         )}
 
@@ -132,13 +140,13 @@ export function PropertyCard({
           </div>
         )}
 
-        <div className="flex flex-col gap-3 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-t border-slate-200 pt-4">
           <div className="min-w-0">
             <p className="mb-1 text-xs text-slate-500">Valor</p>
             <p className="text-xl font-bold leading-none text-amber-600">{formatPrice(property.price)}</p>
           </div>
 
-          <span className="inline-flex justify-center rounded-lg bg-amber-600 px-4 py-2 text-sm text-white transition-colors hover:bg-amber-700">
+          <span className="mt-4 inline-flex w-full justify-center rounded-lg bg-amber-600 px-4 py-2 text-sm text-white transition-colors hover:bg-amber-700">
             {actionLabel}
           </span>
         </div>

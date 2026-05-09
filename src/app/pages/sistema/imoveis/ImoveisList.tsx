@@ -156,7 +156,10 @@ export function ImoveisList() {
     if (!confirm('Excluir este imóvel? As fotos vinculadas também serão removidas.')) return
     setExcluindo(id)
     try {
-      await apiFetch(API.IMOVEL_EXCLUIR(id), { method: 'POST' })
+      await apiFetch(API.IMOVEL_EXCLUIR(id), {
+        method: 'POST',
+        body: JSON.stringify({}),
+      })
       setImoveis((prev) => prev.filter((i) => i.id_imovel !== id))
     } catch {
       alert('Erro ao excluir imóvel.')

@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, Outlet } from 'react-router'
-import { Home, Building2, Settings, LogOut, ChevronRight, Loader2, Menu, X } from 'lucide-react'
+import { Home, Building2, Settings, ListChecks, LogOut, ChevronRight, Loader2, Menu, X } from 'lucide-react'
 import { isAuthenticated, logout, validateSession } from '../../lib/auth'
 
 const NAV = [
-  { path: '/sistema/home',          label: 'Dashboard',             Icon: Home      },
-  { path: '/sistema/imoveis',       label: 'Imóveis',               Icon: Building2 },
-  { path: '/sistema/configuracoes', label: 'Configurações do Site', Icon: Settings  },
+  { path: '/sistema/home', label: 'Dashboard', Icon: Home },
+  { path: '/sistema/imoveis', label: 'Imoveis', Icon: Building2 },
+  { path: '/sistema/caracteristicas', label: 'Caracteristicas', Icon: ListChecks },
+  { path: '/sistema/configuracoes', label: 'Configuracoes do Site', Icon: Settings },
 ]
 
 export function SistemaLayout() {
@@ -76,7 +77,7 @@ export function SistemaLayout() {
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-sm truncate">Gerenciamento</p>
-              <p className="text-xs text-slate-400 truncate">Sistema Imobiliário</p>
+              <p className="text-xs text-slate-400 truncate">Sistema Imobiliario</p>
             </div>
             <button
               type="button"
@@ -91,10 +92,8 @@ export function SistemaLayout() {
 
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
           {NAV.map(({ path, label, Icon }) => {
-            const active =
-              path === '/sistema/imoveis'
-                ? location.pathname.startsWith('/sistema/imoveis')
-                : location.pathname === path
+            const active = location.pathname === path || location.pathname.startsWith(`${path}/`)
+
             return (
               <Link
                 key={path}
@@ -122,7 +121,7 @@ export function SistemaLayout() {
             className="flex items-center gap-3 px-3 py-2 rounded-lg text-xs text-slate-500 hover:bg-slate-800 hover:text-slate-300 transition-colors"
           >
             <Home size={14} />
-            Ver site público
+            Ver site publico
           </a>
           <button
             onClick={handleLogout}

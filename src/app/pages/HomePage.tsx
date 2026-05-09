@@ -211,10 +211,12 @@ export function HomePage() {
             id: Number(item.id || item.ID || item.imovel_id || item.id_imovel || 0),
             title: item.title || item.titulo || item.nome || 'Sem título',
             subtitle:
-              item.bairro ||
-              item.BAIRRO ||
               item.subtitle ||
               item.subtitulo ||
+              item.SUBTITLE ||
+              item.SUBTITULO ||
+              item.bairro ||
+              item.BAIRRO ||
               item.endereco ||
               item.descricao ||
               '',
