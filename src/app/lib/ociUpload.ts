@@ -3,9 +3,6 @@
 // Crie uma PAR com permissao de escrita no prefixo desejado.
 // Observacao: PAR do OCI permite upload/leitura, mas nao exclusao de objetos.
 // Exemplo de PAR URL: https://objectstorage.sa-saopaulo-1.oraclecloud.com/p/SEU_TOKEN/n/grjkkkmo3naa/b/bucket_imoveis/o/
-const OCI_PAR_URL_PADRAO =
-  'https://objectstorage.sa-saopaulo-1.oraclecloud.com/p/3JV4Zv8vTfzj6RuhiNrkHXkWbuOO07CiHwyZhAmsiReiP1z26aaLdxiv1D1uKuEG/n/grjkkkmo3naa/b/bucket_imoveis/o/'
-
 // URL base usada para ler/exibir as imagens no site.
 // Se o bucket nao for publico, troque para uma URL de leitura valida
 // (por exemplo uma PAR separada com permissao de leitura).
@@ -15,7 +12,7 @@ const OCI_READ_BASE_PADRAO =
 const OCI_PAR_URL_ENV = import.meta.env.VITE_OCI_PAR_URL
 const OCI_READ_BASE_ENV = import.meta.env.VITE_OCI_READ_BASE
 
-export const OCI_PAR_URL = String(OCI_PAR_URL_ENV ?? OCI_PAR_URL_PADRAO).trim()
+export const OCI_PAR_URL = String(OCI_PAR_URL_ENV ?? '').trim()
 export const OCI_READ_BASE = String(OCI_READ_BASE_ENV ?? OCI_READ_BASE_PADRAO).trim().replace(/\/+$/, '')
 
 const OCI_IMOVEIS_ROOT = 'img_imoveis'
@@ -36,7 +33,7 @@ function sanitizeFilenamePart(value: string): string {
 export async function uploadParaOCI(file: File, pasta?: string): Promise<string> {
   if (!ociConfigurado()) {
     throw new Error(
-      'OCI_PAR_URL nao configurada. Edite src/app/lib/ociUpload.ts e insira sua PAR URL.'
+      'OCI_PAR_URL nao configurada. Defina VITE_OCI_PAR_URL no ambiente local ou no deploy da Vercel.'
     )
   }
 
