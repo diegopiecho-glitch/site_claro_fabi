@@ -163,6 +163,7 @@ export function ImoveisForm() {
   const [loading, setLoading] = useState(isEdit)
   const [salvando, setSalvando] = useState(false)
   const [uploadando, setUploadando] = useState(false)
+  const [uploadResumo, setUploadResumo] = useState('')
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState('')
   const [arrastandoId, setArrastandoId] = useState<number | null>(null)
@@ -335,10 +336,46 @@ export function ImoveisForm() {
     }
   }
 
+  const criarFotoNoSistema = async (
+    file: File,
+    ordem: number,
+    tornarPrincipal: boolean
+  ): Promise<Foto> => {
+    if (!imovelId) throw new Error('Imovel invalido para upload.')
+
+    const url = await uploadParaOCI(file, String(imovelId))
+    const respostaFoto = await apiFetch<any>(API.FOTO_CRIAR, {
+      method: 'POST',
+      body: JSON.stringify({ id_imovel: imovelId, url, ordem }),
+    })
+
+    const fotoCriada = normalizarFoto(respostaFoto) ?? {
+      id_foto: Date.now() + ordem,
+      id_imovel: imovelId,
+      url,
+      ordem,
+      foto_principal: tornarPrincipal ? 'S' : 'N',
+    }
+
+    if (tornarPrincipal) {
+      await apiFetch(API.FOTO_ATUALIZAR(fotoCriada.id_foto), {
+        method: 'POST',
+        body: JSON.stringify({
+          ordem,
+          foto_principal: 'S',
+        }),
+      })
+
+      return { ...fotoCriada, foto_principal: 'S' }
+    }
+
+    return { ...fotoCriada, foto_principal: fotoCriada.foto_principal ?? 'N' }
+  }
+
   const handleUploadFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const files = Array.from(e.target.files ?? [])
     if (inputFotoRef.current) inputFotoRef.current.value = ''
-    if (!file || !imovelId) return
+    if (files.length === 0 || !imovelId) return
 
     if (!ociConfigurado()) {
       alert('Configure VITE_OCI_PAR_URL no ambiente local ou no deploy da Vercel para habilitar uploads.')
@@ -346,23 +383,31 @@ export function ImoveisForm() {
     }
 
     setUploadando(true)
+    setUploadResumo('')
     try {
-      const url = await uploadParaOCI(file, String(imovelId))
-      const respostaFoto = await apiFetch<any>(API.FOTO_CRIAR, {
-        method: 'POST',
-        body: JSON.stringify({ id_imovel: imovelId, url, ordem: fotos.length + 1 }),
-      })
+      const fotosAtuais = [...fotos]
+      const novasFotos: Foto[] = []
+      const houvePrincipalAnterior = fotosAtuais.some((foto) => (foto.foto_principal ?? 'N') === 'S')
 
-      const novaFoto = normalizarFoto(respostaFoto) ?? {
-        id_foto: Date.now(),
-        id_imovel: imovelId,
-        url,
-        ordem: fotos.length + 1,
-        foto_principal: fotos.length === 0 ? 'S' : 'N',
+      for (const [index, file] of files.entries()) {
+        setUploadResumo(`Enviando ${index + 1} de ${files.length} foto${files.length === 1 ? '' : 's'}...`)
+
+        const ordem = fotosAtuais.length + novasFotos.length + 1
+        const tornarPrincipal = !houvePrincipalAnterior && novasFotos.length === 0
+        const novaFoto = await criarFotoNoSistema(file, ordem, tornarPrincipal)
+        novasFotos.push(novaFoto)
+        setFotos(ordenarFotos([...fotosAtuais, ...novasFotos]))
       }
 
-      setFotos((prev) => ordenarFotos([...prev, novaFoto]))
+      setUploadResumo('')
+
+      setSucesso(
+        files.length === 1
+          ? 'Foto enviada com sucesso!'
+          : `${files.length} fotos enviadas com sucesso!`
+      )
     } catch (e) {
+      setUploadResumo('')
       alert(e instanceof Error ? e.message : 'Erro ao enviar foto')
     } finally {
       setUploadando(false)
@@ -748,17 +793,24 @@ export function ImoveisForm() {
               {uploadando
                 ? <Loader2 size={15} className="animate-spin" />
                 : <Upload size={15} />}
-              {uploadando ? 'Enviando...' : 'Enviar Foto'}
+              {uploadando ? 'Enviando...' : 'Enviar Fotos'}
               <input
                 ref={inputFotoRef}
                 type="file"
                 accept="image/*"
+                multiple
                 className="hidden"
                 onChange={handleUploadFoto}
                 disabled={uploadando}
               />
             </label>
           </div>
+
+          {uploadando && uploadResumo && (
+            <div className="mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+              {uploadResumo}
+            </div>
+          )}
 
           {!ociConfigurado() && (
             <div className="mb-5 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm">

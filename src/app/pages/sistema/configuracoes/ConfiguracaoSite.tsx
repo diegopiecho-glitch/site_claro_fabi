@@ -273,7 +273,7 @@ export function ConfiguracaoSite() {
   }
 
   return (
-    <div className="p-8 max-w-4xl">
+    <div className="max-w-4xl px-8 pb-8 pt-32 md:pt-36">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-slate-900">Configuracoes do Site</h1>
         <p className="text-slate-500 mt-1">Personalize textos, imagens e informacoes de contato</p>
@@ -292,7 +292,7 @@ export function ConfiguracaoSite() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form id="configuracao-site-form" onSubmit={handleSubmit} className="space-y-5">
         <Secao titulo="Identidade Visual e Corretor">
           <Campo label="Nome do corretor" span2>
             <Input value={config.nome_corretor ?? ''} onChange={set('nome_corretor')} placeholder="Ex: Fabiane Niewierowska" />
@@ -396,15 +396,28 @@ export function ConfiguracaoSite() {
           </div>
         )}
 
-        <Button
-          type="submit"
-          disabled={salvando || uploadingField !== null || (configId === null && !temDadosCarregados)}
-          className="bg-amber-600 hover:bg-amber-700 text-white gap-2 px-8 h-11"
-        >
-          {salvando ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-          {salvando ? 'Salvando...' : 'Salvar Configuracoes'}
-        </Button>
       </form>
+
+      <div className="fixed left-0 right-0 top-[69px] z-30 border-b border-slate-200 bg-white/95 backdrop-blur md:left-60 md:top-0">
+        <div className="mx-auto flex max-w-4xl items-center justify-between gap-4 px-4 py-4 sm:px-6 md:px-8">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-slate-900">Configuracoes do site</p>
+            <p className="text-xs text-slate-500">
+              {salvando ? 'Salvando configuracoes...' : 'As alteracoes ficam disponiveis apos salvar.'}
+            </p>
+          </div>
+
+          <Button
+            type="submit"
+            form="configuracao-site-form"
+            disabled={salvando || uploadingField !== null || (configId === null && !temDadosCarregados)}
+            className="h-11 shrink-0 gap-2 bg-amber-600 px-8 text-white hover:bg-amber-700"
+          >
+            {salvando ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+            {salvando ? 'Salvando...' : 'Salvar Configurações'}
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }
