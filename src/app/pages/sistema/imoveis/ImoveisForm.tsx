@@ -341,7 +341,7 @@ export function ImoveisForm() {
     if (!file || !imovelId) return
 
     if (!ociConfigurado()) {
-      alert('Configure OCI_PAR_URL em src/app/lib/ociUpload.ts para habilitar uploads.')
+      alert('Configure VITE_OCI_PAR_URL no ambiente local ou no deploy da Vercel para habilitar uploads.')
       return
     }
 
@@ -762,11 +762,11 @@ export function ImoveisForm() {
 
           {!ociConfigurado() && (
             <div className="mb-5 p-4 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-sm">
-              <strong>OCI nao configurada.</strong> Edite{' '}
+              <strong>OCI nao configurada.</strong> Defina{' '}
               <code className="font-mono bg-amber-100 px-1 rounded text-amber-900">
-                src/app/lib/ociUpload.ts
+                VITE_OCI_PAR_URL
               </code>{' '}
-              e insira sua <code className="font-mono bg-amber-100 px-1 rounded text-amber-900">OCI_PAR_URL</code> para habilitar o upload de fotos.
+              no ambiente local ou no deploy da Vercel para habilitar o upload de fotos.
             </div>
           )}
 
