@@ -14,6 +14,7 @@ import { ImoveisList }        from "./pages/sistema/imoveis/ImoveisList";
 import { ImoveisForm }        from "./pages/sistema/imoveis/ImoveisForm";
 import { ConfiguracaoSite }   from "./pages/sistema/configuracoes/ConfiguracaoSite";
 import { CaracteristicasPage } from "./pages/sistema/caracteristicas/CaracteristicasPage";
+import { SimuladorParcelamento } from "./pages/sistema/simulador/SimuladorParcelamento";
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +43,7 @@ export const router = createBrowserRouter([
               { path: "imoveis/novo",           Component: ImoveisForm     },
               { path: "imoveis/:id/editar",     Component: ImoveisForm     },
               { path: "caracteristicas",        Component: CaracteristicasPage },
+              { path: "simulador-parcelamento", Component: SimuladorParcelamento },
               { path: "configuracoes",          Component: ConfiguracaoSite },
             ],
           },

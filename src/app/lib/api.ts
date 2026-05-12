@@ -12,6 +12,9 @@ export const API = {
   FOTOS_LISTA:                `${ORDS_BASE}/fotodetalheimovel/`,
   CARACTERISTICAS_LISTA:      `${ORDS_BASE}/caracteristicas/`,
   CONFIG_LISTA:               `${ORDS_BASE}/customizacao_site/`,
+  SIMULACAO_LISTA:            `${ORDS_BASE}/simulacoes/`,
+  SIMULACAO_DETALHE:          (id: number | string) => `${ORDS_BASE}/simulacoes/${id}`,
+  SIMULACAO_PARCELAS:         (id: number | string) => `${ORDS_BASE}/simulacoes/${id}/parcelas`,
 
   // Autenticacao administrativa
   AUTH_LOGIN:                 `${ORDS_BASE}/admin/auth/login`,
@@ -30,6 +33,9 @@ export const API = {
   CARACTERISTICA_EXCLUIR:     `${ORDS_BASE}/admin/caracteristica/excluir`,
   IMOVEL_CARACTERISTICAS_SINCRONIZAR: `${ORDS_BASE}/admin/caracteristica-imovel/sincronizar`,
   CONFIG_ATUALIZAR:           (id: number | string) => `${ORDS_BASE}/admin/config/${id}`,
+  SIMULACAO_CALCULAR:         `${ORDS_BASE}/admin/simulacoes/calcular`,
+  SIMULACAO_SALVAR:           `${ORDS_BASE}/admin/simulacoes/`,
+  SIMULACAO_EXCLUIR:          (id: number | string) => `${ORDS_BASE}/admin/simulacoes/excluir/${id}`,
 }
 
 function getSessionToken(): string {

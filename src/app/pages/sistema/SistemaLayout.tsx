@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, Outlet } from 'react-router'
-import { Home, Building2, Settings, ListChecks, LogOut, ChevronRight, Loader2, Menu, X } from 'lucide-react'
+import { Home, Building2, Settings, ListChecks, LogOut, ChevronRight, Loader2, Menu, X, Calculator } from 'lucide-react'
 import { isAuthenticated, logout, validateSession } from '../../lib/auth'
 
 const NAV = [
   { path: '/sistema/home', label: 'Dashboard', Icon: Home },
   { path: '/sistema/imoveis', label: 'Imoveis', Icon: Building2 },
   { path: '/sistema/caracteristicas', label: 'Caracteristicas', Icon: ListChecks },
+  { path: '/sistema/simulador-parcelamento', label: 'Simulador de Parcelamento', Icon: Calculator },
   { path: '/sistema/configuracoes', label: 'Configuracoes do Site', Icon: Settings },
 ]
 

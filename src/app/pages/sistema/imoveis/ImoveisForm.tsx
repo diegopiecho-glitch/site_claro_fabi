@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router'
 import {
   ArrowLeft, Save, Upload, Trash2, Loader2, ImageIcon, Star, GripVertical, ChevronDown,
+  Calculator,
 } from 'lucide-react'
 import { API, apiFetch } from '../../../lib/api'
 import { uploadParaOCI, ociConfigurado } from '../../../lib/ociUpload'
@@ -752,7 +753,7 @@ export function ImoveisForm() {
             </Button>
           </Link>
 
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-slate-900">
               {isEdit ? 'Edição do imóvel' : 'Novo imóvel'}
             </p>
@@ -760,6 +761,18 @@ export function ImoveisForm() {
               {salvando ? 'Salvando alterações no imóvel...' : 'As alterações ficam disponíveis após salvar.'}
             </p>
           </div>
+
+          {isEdit && imovelId && (
+            <Link to={`/sistema/simulador-parcelamento?imovelId=${imovelId}`}>
+              <Button
+                variant="outline"
+                className="h-11 shrink-0 gap-2 border-amber-200 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
+              >
+                <Calculator size={16} />
+                Abrir simulador
+              </Button>
+            </Link>
+          )}
 
           <Button
             type="submit"
